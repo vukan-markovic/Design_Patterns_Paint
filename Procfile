@@ -1,1 +1,1 @@
-web: java -jar Drawing.jar
+web: java -jar application.jar
