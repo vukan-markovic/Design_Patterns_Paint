@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Aplikacija za crtanje dvodimenzionalnih
 geometrijskih oblika
 - Funkcionalnost dodavanja, brisanja i modifikacije oblika na crtežu
@@ -37,3 +38,6 @@ Controller – definiše kako aplikacija reaguje na interakciju korisnika
 
 Za stanje dugmica - brisanje, selekcija, undo/redo - observer obrazac
 Kod CmdUpdatePoint - originalState = oldState.clone();
+=======
+# Design-Pattern-Drawing
+>>>>>>> 585e0e794800ae30d73bcdedad3cea7566e4fc28
