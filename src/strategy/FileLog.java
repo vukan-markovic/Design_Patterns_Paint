@@ -9,7 +9,11 @@ import java.io.IOException;
 import javax.swing.DefaultListModel;
 import adapter.HexagonAdapter;
 import commands.CmdAddShape;
+import commands.CmdBringToBack;
+import commands.CmdBringToFront;
 import commands.CmdRemoveShape;
+import commands.CmdToBack;
+import commands.CmdToFront;
 import commands.CmdUpdateCircle;
 import commands.CmdUpdateHexagon;
 import commands.CmdUpdateLine;
@@ -27,24 +31,25 @@ import shapes.Rectangle;
 import shapes.Shape;
 import shapes.Square;
 
-public class FileLog implements FileManager {
+public class FileLog implements FileHandler {
 	private BufferedWriter writer;
 	private BufferedReader reader;
 	private DrawingFrame frame;
 	private DrawingModel model;
+	private DefaultListModel<String> log;
 	private LogParser logParser;
 	private Shape shape;
-	private String shapeType;
 	
 	public FileLog(DrawingFrame frame) {
 		this.frame = frame;
 		model = frame.getView().getModel();
+		log = frame.getList();
 	}
 
 	@Override
 	public void save(File file) {
 		try {
-			writer = new BufferedWriter(new FileWriter(file));
+			writer = new BufferedWriter(new FileWriter(file + ".log"));
 			DefaultListModel<String> list = frame.getList();
 			for (int i = 0; i < frame.getList().size(); i++) {
 				writer.write(list.getElementAt(i));
@@ -75,88 +80,79 @@ public class FileLog implements FileManager {
 	}
 	
 	public void readLine(String command) {
-//		String[] commands = command.split("->");
-//		switch(commands[0]) {
-//		case "Added point":
-//			shape = new Point();
-//			shapeType = "point";
-//			new CmdAddShape(shape ,model, frame.getList(), shapeType).execute(); 
-//			break;
+		String[] commands = command.split("->");
+		switch(commands[0]) {
+		case "Added point":
+			new CmdAddShape(new Point(), model, frame.getList()).execute(); 
+			break;
 //		case "Added hexagon":
-//			shape = new HexagonAdapter(new Hexagon());
-//			shapeType = "hexagon";
-//			new CmdAddShape(shape ,model, frame.getList(), shapeType).execute(); 
+//			new CmdAddShape(new HexagonAdapter(new Hexagon()), model, log, "hexagon").execute(); 
 //			break;
-//		case "Added line":
-//			shape = new Line();
-//			shapeType = "line";
-//			new CmdAddShape(shape ,model, frame.getList(), shapeType).execute(); 
-//			break;
-//		case "Added circle":
-//			shape = new Circle();
-//			shapeType = "circle";
-//			new CmdAddShape(shape ,model, frame.getList(), shapeType).execute(); 
-//			break;
-//		case "Added rectangle":
-//			shape = new Rectangle();
-//			shapeType = "rectangle";
-//			new CmdAddShape(shape ,model, frame.getList(), shapeType).execute(); 
-//			break;
-//		case "Added square":
-//			shape = new Square();
-//			shapeType = "square";
-//			new CmdAddShape(shape ,model, frame.getList(), shapeType).execute(); 
-//			break;
+		case "Added line":
+			new CmdAddShape(new Line(), model, log).execute(); 
+			break;
+		case "Added circle":
+			new CmdAddShape(new Circle(), model, log).execute(); 
+			break;
+		case "Added rectangle":
+			new CmdAddShape(new Rectangle(), model, log).execute(); 
+			break;
+		case "Added square":
+			new CmdAddShape(new Square(), model, log).execute(); 
+			break;
 //		case "Updated point":
-//			shape = new Point();
-//			new CmdUpdatePoint(oldState, newState, frame.getList()).execute();
+//			new CmdUpdatePoint(oldState, new Point(), frame.getList()).execute();
 //			break;
 //		case "Updated hexagon":
-//			shape = new HexagonAdapter(new Hexagon());
-//			new CmdUpdateHexagon(oldState, newState, log).execute();
+//			new CmdUpdateHexagon(oldState, new HexagonAdapter(new Hexagon()), log).execute();
 //			break;
 //		case "Updated line":
-//			shape = new Line();
-//			new CmdUpdateLine(oldState, newState, log).execute();
+//			new CmdUpdateLine(oldState, new Line(), log).execute();
 //			break;
 //		case "Updated circle":
-//			shape = new Circle();
-//			new CmdUpdateCircle(oldState, newState, log).execute();
+//			new CmdUpdateCircle(oldState, new Circle(), log).execute();
 //			break;
 //		case "Updated rectangle":
-//			shape = new Rectangle();
-//			new CmdUpdateRectangle(oldState, newState, log).execute();
+//			new CmdUpdateRectangle(oldState, new Rectangle(), log).execute();
 //			break;
 //		case "Updated square":
-//			shape = new Square();
-//			new CmdUpdateSquare(oldState, newState, log).execute();
+//			new CmdUpdateSquare(oldState, new Square(), log).execute();
 //			break;
 //		case "Removed point":
-//			shape = new Point();
-//			new CmdRemoveShape(shapes, model, frame.getList()).execute();
+//			new CmdRemoveShape(, model, log).execute();
 //			break;
 //		case "Removed hexagon":
-//			shape = new HexagonAdapter(new Hexagon());
-//			new CmdRemoveShape(shapes, model, frame.getList()).execute();
+//			new CmdRemoveShape(, model, log).execute();
 //			break;
 //		case "Removed line":
-//			shape = new Line();
-//			new CmdRemoveShape(shapes, model, frame.getList()).execute();
+//			new CmdRemoveShape(, model, log).execute();
 //			break;
 //		case "Removed circle":
 //			shape = new Circle();
-//			new CmdRemoveShape(shapes, model, frame.getList()).execute();
+//			new CmdRemoveShape(, model, log).execute();
 //			break;
 //		case "Removed rectangle":
 //			shape = new Rectangle();
-//			new CmdRemoveShape(shapes, model, frame.getList()).execute();
+//			new CmdRemoveShape(, model, log).execute();
 //			break;
 //		case "Removed square":
 //			shape = new Square();
-//			new CmdRemoveShape(shapes, model, frame.getList()).execute();
+//			new CmdRemoveShape(, model, log).execute();
 //			break;
-//		}
-//		
+		case "Bring to front":
+			new CmdBringToFront(model, shape, log).execute();
+			break;
+		case "Bring to back":
+			new CmdBringToBack(model, shape, log).execute();
+			break;
+		case "To front":
+			new CmdToFront(model, shape, log).execute();
+			break;
+		case "To back":
+			new CmdToBack(model, shape, log).execute();
+			break;
+		}
+		frame.getView().repaint();
 		try {
 			String line = reader.readLine();
 			if (line != null) logParser.addCommand(line);

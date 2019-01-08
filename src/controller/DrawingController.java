@@ -1,20 +1,12 @@
 package controller;
 
-import java.awt.AWTException;
 import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Robot;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Stack;
-import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
@@ -45,6 +37,9 @@ import hexagon.Hexagon;
 import model.DrawingModel;
 import shapes.Circle;
 import shapes.Square;
+import strategy.FileDraw;
+import strategy.FileHandler;
+import strategy.FileLog;
 import strategy.FileManager;
 import view.DrawingView;
 import shapes.Line;
@@ -69,8 +64,6 @@ public class DrawingController {
 	private PropertyChangeSupport propertyChangeSupport;
 	private int counter = 0;
 	private boolean selected;
-	private Stack<Command> commands;
-	private Stack<Command> undoCommands;
 	private FileManager fileManager;
 	private DefaultListModel<String> log;
 	private JFileChooser chooser;
@@ -80,8 +73,6 @@ public class DrawingController {
 		this.frame = frame;
 		initialPointOfLine = null;
 		propertyChangeSupport = new PropertyChangeSupport(this);
-		commands = new Stack<Command>();
-		undoCommands = new Stack<Command>();
 		chooser = new JFileChooser();
 		log = frame.getList();
 	}
@@ -126,12 +117,7 @@ public class DrawingController {
 	 */
 	public void btnAddPointClicked(MouseEvent click) {
 		unselect();
-		Point p = new Point(click.getX(), click.getY(), edgeColor);
-		CmdAddShape cmdAddShape = new CmdAddShape(p, model, log, "point");
-		cmdAddShape.execute();
-		if (model.getAll().size() == 1) propertyChangeSupport.firePropertyChange("shape exist", false, true);
-		frame.getView().repaint();
-		commands.add(cmdAddShape);
+		executeCommand(new CmdAddShape(new Point(click.getX(), click.getY(), edgeColor), model, log));
 	}
 	
 	/**
@@ -145,13 +131,8 @@ public class DrawingController {
 		unselect();
 		if(initialPointOfLine == null) initialPointOfLine = new Point(click.getX(), click.getY(), edgeColor);
 		else {
-			Line l = new Line(initialPointOfLine, new Point(click.getX(), click.getY()), edgeColor);
-			CmdAddShape cmdAddShape = new CmdAddShape(l, model, log, "line");
-			cmdAddShape.execute();
-			if (model.getAll().size() == 1) propertyChangeSupport.firePropertyChange("shape exist", false, true);
+			executeCommand(new CmdAddShape(new Line(initialPointOfLine, new Point(click.getX(), click.getY()), edgeColor), model, log));
 			initialPointOfLine = null;
-			frame.getView().repaint();
-			commands.add(cmdAddShape);
 		}
 	}
 	
@@ -169,16 +150,10 @@ public class DrawingController {
 		square.deleteButtons();
 		square.setVisible(true);
 		if (square.isConfirmed()) {
-			if (square.getWidth() + click.getX() > frame.getView().getWidth() || square.getWidth() + click.getY() > frame.getView().getHeight() || click.getY() - square.getWidth() <= 0 || click.getX() - square.getWidth() < 0) {
+			if (square.getWidth() + click.getX() > frame.getView().getWidth() || square.getWidth() + click.getY() > frame.getView().getHeight() || click.getY() - square.getWidth() <= 0 || click.getX() - square.getWidth() < 0)
 				JOptionPane.showMessageDialog(null, "The square goes out of drawing!");
-			} else {
-				Square s = new Square(new Point(click.getX(), click.getY()), square.getSideLength(), edgeColor, interiorColor);
-				CmdAddShape cmdAddShape = new CmdAddShape(s, model, log, "square");
-				cmdAddShape.execute();
-				if (model.getAll().size() == 1) propertyChangeSupport.firePropertyChange("shape exist", false, true);
-				frame.getView().repaint();
-				commands.add(cmdAddShape);
-			}
+			else 
+				executeCommand(new CmdAddShape(new Square(new Point(click.getX(), click.getY()), square.getSideLength(), edgeColor, interiorColor), model, log));
 		}
 	}
 	
@@ -197,16 +172,10 @@ public class DrawingController {
 		rectangle.deleteButtons();
 		rectangle.setVisible(true);
 		if (rectangle.isConfirmed()) {
-			if (rectangle.getWidth() + click.getX() > frame.getView().getWidth() || rectangle.getHeight() + click.getY() > frame.getView().getHeight() || click.getY() - rectangle.getHeight() <= 0 || click.getX() - rectangle.getWidth() < 0) {
+			if (rectangle.getWidth() + click.getX() > frame.getView().getWidth() || rectangle.getHeight() + click.getY() > frame.getView().getHeight() || click.getY() - rectangle.getHeight() <= 0 || click.getX() - rectangle.getWidth() < 0)
 				JOptionPane.showMessageDialog(null, "The rectangle goes out of drawing!");
-			} else {
-				Rectangle r = new Rectangle(new Point(click.getX(), click.getY()), rectangle.getRectangleWidth(), rectangle.getRectangleHeight(), edgeColor, interiorColor);
-				CmdAddShape cmdAddShape = new CmdAddShape(r, model, log, "rectangle");
-				cmdAddShape.execute();
-				if (model.getAll().size() == 1) propertyChangeSupport.firePropertyChange("shape exist", false, true);
-				frame.getView().repaint();
-				commands.add(cmdAddShape);
-			}
+			else
+				executeCommand(new CmdAddShape(new Rectangle(new Point(click.getX(), click.getY()), rectangle.getRectangleWidth(), rectangle.getRectangleHeight(), edgeColor, interiorColor), model, log));
 		}
 	}
 	
@@ -225,16 +194,10 @@ public class DrawingController {
 		circle.deleteButtons();
 		circle.setVisible(true);
 		if (circle.isConfirmed()) {
-			if (circle.getRadiusLength() + click.getX() > frame.getView().getWidth() || circle.getRadiusLength() + click.getY() > frame.getView().getHeight() || click.getY() - circle.getRadiusLength() <= 0 || click.getX() - circle.getRadiusLength() < 0) {
+			if (circle.getRadiusLength() + click.getX() > frame.getView().getWidth() || circle.getRadiusLength() + click.getY() > frame.getView().getHeight() || click.getY() - circle.getRadiusLength() <= 0 || click.getX() - circle.getRadiusLength() < 0)
 				JOptionPane.showMessageDialog(null, "The circle goes out of drawing!");
-			} else {
-				Circle c = new Circle(new Point(click.getX(), click.getY()), circle.getRadiusLength(), edgeColor, interiorColor);
-				CmdAddShape cmdAddShape = new CmdAddShape(c, model, log, "circle");
-				cmdAddShape.execute();
-				if (model.getAll().size() == 1) propertyChangeSupport.firePropertyChange("shape exist", false, true);
-				frame.getView().repaint();
-				commands.add(cmdAddShape);
-			}
+			else 
+				executeCommand(new CmdAddShape(new Circle(new Point(click.getX(), click.getY()), circle.getRadiusLength(), edgeColor, interiorColor), model, log));
 		}
 	}
 	
@@ -253,28 +216,18 @@ public class DrawingController {
 		dlgHexagon.deleteButtons();
 		dlgHexagon.setVisible(true);
 		if (dlgHexagon.isConfirmed()) {
-			if (dlgHexagon.getRadiusLength() + click.getX() > frame.getView().getWidth() || dlgHexagon.getRadiusLength() + click.getY() > frame.getView().getHeight() || click.getY() - dlgHexagon.getRadiusLength() <= 0 || click.getX() - dlgHexagon.getRadiusLength() < 0) {
+			if (dlgHexagon.getRadiusLength() + click.getX() > frame.getView().getWidth() || dlgHexagon.getRadiusLength() + click.getY() > frame.getView().getHeight() || click.getY() - dlgHexagon.getRadiusLength() <= 0 || click.getX() - dlgHexagon.getRadiusLength() < 0)
 				JOptionPane.showMessageDialog(null, "The hexagon goes out of drawing!");
-			} else {
+			else {
 				Hexagon hexagon = new Hexagon(click.getX(), click.getY(), dlgHexagon.getRadiusLength());
 				hexagon.setBorderColor(edgeColor);
 				hexagon.setAreaColor(interiorColor);
-				HexagonAdapter h = new HexagonAdapter(hexagon);
-				CmdAddShape cmdAddShape = new CmdAddShape(h, model, log, "hexagon");
-				cmdAddShape.execute();
-				if (model.getAll().size() == 1) propertyChangeSupport.firePropertyChange("shape exist", false, true);
-				frame.getView().repaint();		
-				commands.add(cmdAddShape);
+				executeCommand(new CmdAddShape(new HexagonAdapter(hexagon), model, log));
 			}
 		}
 	}
 
 	public void btnSelectShapeClicked(MouseEvent click) {
-		if(model.getAll().isEmpty()) {
-			propertyChangeSupport.firePropertyChange("shape don't exist", false, true);
-			JOptionPane.showMessageDialog(null, "There is no shapes for selection!", "Notification", JOptionPane.INFORMATION_MESSAGE);
-		}
-		
 		Iterator <Shape> iterator = model.getAll().iterator();	
 		ArrayList<Integer> tempListOfShapes = new ArrayList<>();
 		
@@ -326,28 +279,14 @@ public class DrawingController {
 		DlgPoint point = new DlgPoint();
 		point.write((Point) shape);
 		point.setVisible(true);
-		if(point.isConfirmed()) {
-			Point pointForModification = (Point) shape;
-			Point p = new Point(point.getXcoordinate(), point.getYcoordinate(), point.getColor());
-			CmdUpdatePoint cmdUpdatePoint = new CmdUpdatePoint(pointForModification, p, log);
-			cmdUpdatePoint.execute();
-			frame.getView().repaint();
-			commands.add(cmdUpdatePoint);
-		}
+		if(point.isConfirmed()) executeCommand(new CmdUpdatePoint((Point) shape, new Point(point.getXcoordinate(), point.getYcoordinate(), point.getColor()), log));
 	}
 	
 	public void btnUpdateLineClicked(Shape shape) {
 		DlgLine line = new DlgLine();
 		line.write((Line) shape);
 		line.setVisible(true);
-		if(line.isConfirmed()) {
-			Line lineForModification = (Line) shape;
-			Line l = new Line(new Point(line.getXcoordinateInitial(), line.getYcoordinateInitial()), new Point(line.getXcoordinateLast(), line.getYcoordinateLast()), line.getColor());
-			CmdUpdateLine cmdUpdateLine = new CmdUpdateLine(lineForModification, l, log);
-			cmdUpdateLine.execute();
-			frame.getView().repaint();
-			commands.add(cmdUpdateLine);
-		}	
+		if(line.isConfirmed()) executeCommand(new CmdUpdateLine((Line) shape, new Line(new Point(line.getXcoordinateInitial(), line.getYcoordinateInitial()), new Point(line.getXcoordinateLast(), line.getYcoordinateLast()), line.getColor()), log));
 	}
 	
 	public void btnUpdateRectangleClicked(Shape shape) {
@@ -355,16 +294,8 @@ public class DrawingController {
 		rectangle.fillUp((Rectangle) shape);
 		rectangle.setVisible(true);
 		if(rectangle.isConfirmed()) {
-			if (rectangle.getWidth() + rectangle.getX() > frame.getView().getWidth() || rectangle.getHeight() + rectangle.getY() > frame.getView().getHeight() || rectangle.getY() - rectangle.getHeight() <= 0 || rectangle.getX() - rectangle.getWidth() < 0) {
-				JOptionPane.showMessageDialog(null, "The rectangle goes out of drawing!");
-			} else {
-				Rectangle rectangleForModification = (Rectangle) shape;
-				Rectangle r = new Rectangle(new Point(rectangle.getXcoordinate(), rectangle.getYcoordinate()), rectangle.getRectangleWidth(), rectangle.getRectangleHeight(), rectangle.getEdgeColor(), rectangle.getInteriorColor());
-				CmdUpdateRectangle cmdUpdateRectangle = new CmdUpdateRectangle(rectangleForModification, r, log);
-				cmdUpdateRectangle.execute();
-				frame.getView().repaint();
-				commands.add(cmdUpdateRectangle);
-			}
+			if (rectangle.getWidth() + rectangle.getX() > frame.getView().getWidth() || rectangle.getHeight() + rectangle.getY() > frame.getView().getHeight() || rectangle.getY() - rectangle.getHeight() <= 0 || rectangle.getX() - rectangle.getWidth() < 0) JOptionPane.showMessageDialog(null, "The rectangle goes out of drawing!");
+			else executeCommand(new CmdUpdateRectangle((Rectangle) shape, new Rectangle(new Point(rectangle.getXcoordinate(), rectangle.getYcoordinate()), rectangle.getRectangleWidth(), rectangle.getRectangleHeight(), rectangle.getEdgeColor(), rectangle.getInteriorColor()), log));
 		}
 	}
 
@@ -373,16 +304,8 @@ public class DrawingController {
 		square.fillUp((Square) shape);
 		square.setVisible(true);
 		if(square.isConfirmed()) {
-			if (square.getWidth() + square.getX() > frame.getView().getWidth() || square.getWidth() + square.getY() > frame.getView().getHeight() || square.getY() - square.getWidth() <= 0 || square.getX() - square.getWidth() < 0) {
-				JOptionPane.showMessageDialog(null, "The square goes out of drawing!");
-			} else {
-				Square squareForModification = (Square) shape;
-				Square s = new Square(new Point(square.getXcoordinate(), square.getYcoordinate()), square.getSideLength(), square.getEdgeColor(), square.getInteriorColor());
-				CmdUpdateSquare cmdUpdateSquare = new CmdUpdateSquare(squareForModification, s, log);
-				cmdUpdateSquare.execute();
-				frame.getView().repaint();
-				commands.add(cmdUpdateSquare);
-			}
+			if (square.getWidth() + square.getX() > frame.getView().getWidth() || square.getWidth() + square.getY() > frame.getView().getHeight() || square.getY() - square.getWidth() <= 0 || square.getX() - square.getWidth() < 0) JOptionPane.showMessageDialog(null, "The square goes out of drawing!");
+			else executeCommand(new CmdUpdateSquare((Square) shape, new Square(new Point(square.getXcoordinate(), square.getYcoordinate()), square.getSideLength(), square.getEdgeColor(), square.getInteriorColor()), log));
 		}
 	}
 	
@@ -391,16 +314,8 @@ public class DrawingController {
 		circle.fillUp((Circle) shape);
 		circle.setVisible(true);
 		if(circle.isConfirmed()) {
-			if (circle.getRadiusLength() + circle.getX() > frame.getView().getWidth() || circle.getRadiusLength() + circle.getY() > frame.getView().getHeight() || circle.getY() - circle.getRadiusLength() <= 0 || circle.getX() - circle.getRadiusLength() < 0) {
-				JOptionPane.showMessageDialog(null, "The circle goes out of drawing!");
-			} else {
-				Circle circleForModification = (Circle) shape;
-				Circle c = new Circle(new Point(circle.getXcoordinateOfCenter(), circle.getYcoordinateOfCenter()), circle.getRadiusLength(), circle.getEdgeColor(), circle.getInteriorColor());
-				CmdUpdateCircle cmdUpdateCircle = new CmdUpdateCircle(circleForModification, c, log);
-				cmdUpdateCircle.execute();
-				frame.getView().repaint();
-				commands.add(cmdUpdateCircle);
-			}
+			if (circle.getRadiusLength() + circle.getX() > frame.getView().getWidth() || circle.getRadiusLength() + circle.getY() > frame.getView().getHeight() || circle.getY() - circle.getRadiusLength() <= 0 || circle.getX() - circle.getRadiusLength() < 0) JOptionPane.showMessageDialog(null, "The circle goes out of drawing!");
+			else executeCommand(new CmdUpdateCircle((Circle) shape, new Circle(new Point(circle.getXcoordinateOfCenter(), circle.getYcoordinateOfCenter()), circle.getRadiusLength(), circle.getEdgeColor(), circle.getInteriorColor()), log));
 		}
 	}
 	
@@ -409,18 +324,12 @@ public class DrawingController {
 		hexagon.fillUp((HexagonAdapter) shape);
 		hexagon.setVisible(true);
 		if (hexagon.isConfirmed()) {
-			if (hexagon.getRadiusLength() + hexagon.getX() > frame.getView().getWidth() || hexagon.getRadiusLength() + hexagon.getY() > frame.getView().getHeight() || hexagon.getY() - hexagon.getRadiusLength() <= 0 || hexagon.getX() - hexagon.getRadiusLength() < 0) {
-				JOptionPane.showMessageDialog(null, "The hexagon goes out of drawing!");
-			} else {
-				HexagonAdapter hexagonForModification = (HexagonAdapter) shape;
+			if (hexagon.getRadiusLength() + hexagon.getX() > frame.getView().getWidth() || hexagon.getRadiusLength() + hexagon.getY() > frame.getView().getHeight() || hexagon.getY() - hexagon.getRadiusLength() <= 0 || hexagon.getX() - hexagon.getRadiusLength() < 0) JOptionPane.showMessageDialog(null, "The hexagon goes out of drawing!");
+			else {
 				Hexagon hex = new Hexagon(hexagon.getXcoordinate(), hexagon.getYcoordinate(), hexagon.getRadiusLength());
 				hex.setAreaColor(hexagon.getInteriorColor());
 				hex.setBorderColor(hexagon.getEdgeColor());
-				HexagonAdapter h = new HexagonAdapter(hex);
-				CmdUpdateHexagon cmdUpdateHexagon = new CmdUpdateHexagon(hexagonForModification, h, log);
-				cmdUpdateHexagon.execute();
-				frame.getView().repaint();
-				commands.add(cmdUpdateHexagon);
+				executeCommand(new CmdUpdateHexagon((HexagonAdapter) shape, new HexagonAdapter(hex), log));
 			}
 		}		
 	}
@@ -448,55 +357,55 @@ public class DrawingController {
 				if(shape.isSelected()) shapesForDeletion.add(shape);
 			}
 			
-			CmdRemoveShape cmdRemoveShape = new CmdRemoveShape(shapesForDeletion, model, log);
-			cmdRemoveShape.execute();
-			if (model.getAll().isEmpty()) propertyChangeSupport.firePropertyChange("shape don't exist", false, true);
-			frame.getView().repaint();
-			commands.add(cmdRemoveShape);
+			executeCommand(new CmdRemoveShape(shapesForDeletion, model, log));
 		}
 	}
 	
+	public void executeCommand(Command command) {
+		command.execute();
+		model.addCommand(command);
+	
+		if (!model.getUndoCommands().isEmpty()) {
+			model.getUndoCommands().removeAllElements();
+			propertyChangeSupport.firePropertyChange("redo turn off", false, true);
+		}
+		
+		if (model.getAll().isEmpty()) {
+			propertyChangeSupport.firePropertyChange("shape don't exist", false, true);
+		} else if (model.getAll().size() == 1) {
+			propertyChangeSupport.firePropertyChange("shape exist", false, true);
+			propertyChangeSupport.firePropertyChange("change position turn off", false, true);
+		} else if (model.getAll().size() == 2) propertyChangeSupport.firePropertyChange("change position turn on", false, true);
+		
+		frame.getView().repaint();
+	}
+	
 	public void undo() {
-		commands.peek().unexecute();
-		undoCommands.push(commands.pop());
-		propertyChangeSupport.firePropertyChange("redo turn on", false, true);
+		model.getCommands().peek().unexecute();
+		model.getUndoCommands().push(model.getCommands().pop());
+		if (model.getUndoCommands().size() == 1) propertyChangeSupport.firePropertyChange("redo turn on", false, true);
+		if (model.getCommands().isEmpty()) propertyChangeSupport.firePropertyChange("undo turn off", false, true);
 		frame.getView().repaint();
 	}
 	
 	public void redo() {		
-		undoCommands.peek().execute();
-		commands.push(undoCommands.pop());
-		if (undoCommands.isEmpty()) propertyChangeSupport.firePropertyChange("redo turn off", false, true);
+		model.getUndoCommands().peek().execute();
+		model.getCommands().push(model.getUndoCommands().pop());
+		if (model.getUndoCommands().isEmpty()) propertyChangeSupport.firePropertyChange("redo turn off", false, true);
+		if (model.getCommands().size() == 1) propertyChangeSupport.firePropertyChange("shape exist", false, true);
 		frame.getView().repaint();
 	}
 	
-	public void save(FileManager fileManager) {
-		this.fileManager = fileManager;
+	public void save(FileHandler fileHandler) {
+		fileManager = new FileManager(fileHandler);
 		chooser.setFileSelectionMode(JFileChooser.SAVE_DIALOG);
 	    chooser.setFileSelectionMode(JFileChooser.FILES_ONLY); 
 		chooser.enableInputMethods(false);
 		chooser.setMultiSelectionEnabled(false);
 		chooser.setFileHidingEnabled(false);
 		chooser.setEnabled(true);
-		chooser.setDialogTitle("Save draw");
-		chooser.setFileFilter(new FileNameExtensionFilter(".ser", "ser"));
+		chooser.setDialogTitle("Save");
 		if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) fileManager.save(chooser.getSelectedFile());
-	}
-
-	public void saveDrawAsImage() {
-		 BufferedImage imagebuffer = null;
-		    try {
-		        imagebuffer = new Robot().createScreenCapture(frame.getView().getBounds());
-		    } catch (AWTException e1) {
-		        e1.printStackTrace();
-		    }  
-		    Graphics2D graphics2D = imagebuffer.createGraphics();
-		     frame.getView().paint(graphics2D);
-		     try {
-		        ImageIO.write(imagebuffer,"jpeg", new File("draw_" + Calendar.getInstance().getTimeInMillis() + ".jpeg"));
-		    } catch (Exception e) {
-		        System.out.println("error");
-		    }
 	}
 	
 	public void open() {
@@ -505,9 +414,10 @@ public class DrawingController {
 		chooser.setFileHidingEnabled(false);
 		chooser.setEnabled(true);
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		chooser.setFileFilter(new FileNameExtensionFilter(".txt", "txt"));
 		if(chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 			model.removeAll();
+			if (chooser.getSelectedFile().getName().split(".")[1].equals("log")) fileManager = new FileManager(new FileLog(frame));
+			else fileManager = new FileManager(new FileDraw(model));
 			fileManager.open(chooser.getSelectedFile());
 			frame.getView().repaint();
 		}	
@@ -515,71 +425,33 @@ public class DrawingController {
 
 	public void newDraw() {
 		model.removeAll();
+		frame.getList().removeAllElements();
 		frame.getView().repaint();
 	}
 
 	public void toFront() {
-		Shape shape = getSelectedShape();
-		CmdToFront cmdToFront = new CmdToFront(model, shape, log, getShapeType(shape));
-		cmdToFront.execute();
-		commands.add(cmdToFront);
-		frame.getView().repaint();
+		executeCommand(new CmdToFront(model, getSelectedShape(), log));
 	}
 
 	public void bringToFront() {
-		Shape shape = getSelectedShape();
-		CmdBringToFront cmdBringToFront = new CmdBringToFront(model, shape, log, getShapeType(shape));
-		cmdBringToFront.execute();
-		commands.add(cmdBringToFront);
-		frame.getView().repaint();
+		executeCommand(new CmdBringToFront(model, getSelectedShape(), log));
 	}
 
-	public void ToBack() {
-		Shape shape = getSelectedShape();
-		CmdToBack cmdToBack = new CmdToBack(model, shape, log, getShapeType(shape));
-		cmdToBack.execute();
-		commands.add(cmdToBack);
-		frame.getView().repaint();
+	public void toBack() {
+		executeCommand(new CmdToBack(model, getSelectedShape(), log));
 	}
 
-	public void BringToBack() {
-		Shape shape = getSelectedShape();
-		CmdBringToBack cmdBringToBack = new CmdBringToBack(model, shape, log, getShapeType(shape));
-		cmdBringToBack.execute();
-		commands.add(cmdBringToBack);
-		frame.getView().repaint();	
+	public void bringToBack() {
+		executeCommand(new CmdBringToBack(model, getSelectedShape(), log));
 	}
 	
-	public String getShapeType(Shape shape) {
-		if (shape instanceof Point) return "point";
-		else if (shape instanceof Line) return "line";
-		else if (shape instanceof Rectangle) return "rectangle";
-		else if (shape instanceof Square) return "square";
-		else if (shape instanceof Circle) return "circle";
-		else return "hexagon";
-	}
-
 	public void updateShapeClicked() {
 		Shape shape = getSelectedShape();
-		switch(getShapeType(shape)) {
-			case "point":
-				btnUpdatePointClicked(shape);
-				break;
-			case "square":
-				btnUpdateSquareClicked(shape);
-				break;
-			case "hexagon":
-				btnUpdateHexagonClicked(shape);
-				break;
-			case "circle":
-				btnUpdateCircleClicked(shape);
-				break;
-			case "line":
-				btnUpdateLineClicked(shape);
-				break;
-			case "rectangle":
-				btnUpdateRectangleClicked(shape);
-				break;
-		}
+		if (shape instanceof Point) btnUpdatePointClicked(shape);
+		else if (shape instanceof Line) btnUpdateLineClicked(shape);
+		else if (shape instanceof Rectangle) btnUpdateRectangleClicked(shape);
+		else if (shape instanceof Square) btnUpdateSquareClicked(shape);
+		else if (shape instanceof Circle) btnUpdateCircleClicked(shape);
+		else btnUpdateHexagonClicked(shape);
 	}
 }

@@ -44,7 +44,7 @@ public class Square extends SurfaceShape implements Comparable<Square> {
      */
     @Override
     public String toString() {
-        return "Point up left = " + getUpLeft() + ", side length = " + side + ", edge color: " + getColor().toString().substring(14) + ", area color: " + getInteriorColor().toString().substring(14);
+        return "Square: up left point: " + getUpLeft() + ", side = " + side + ", edge color = " + getColor().toString().substring(14) + ", area color = " + getInteriorColor().toString().substring(14);
     }
 
     /**
@@ -117,7 +117,7 @@ public class Square extends SurfaceShape implements Comparable<Square> {
     }
     
     public Square clone() {
-    	return new Square(new Point(this.getUpLeft().getXcoordinate(), this.getUpLeft().getYcoordinate(), this.getUpLeft().getColor()), side, getColor(), getInteriorColor());
+    	return new Square(upLeft.clone(), side, getColor(), getInteriorColor());
     }
 
     /**

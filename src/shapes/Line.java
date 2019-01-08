@@ -88,7 +88,7 @@ public class Line extends Shape {
     }
     
     public Line clone() {
-		return new Line(new Point(this.getInitial().getXcoordinate(), this.getInitial().getYcoordinate(), this.getInitial().getColor()), new Point(this.getLast().getXcoordinate(), this.getLast().getYcoordinate(), this.getLast().getColor()), getColor());
+		return new Line(initial.clone(), last.clone(), getColor());
 	}
 
     /**
@@ -121,6 +121,6 @@ public class Line extends Shape {
     
     @Override
     public String toString() {
-    	return "Initial point: " + initial.toString() + ", Last point: " + last.toString() + ", color: " + getColor().toString().substring(14);
+    	return "Line: start point = " + initial.toString() + ", end point = " + last.toString() + ", color = " + getColor().toString().substring(14);
     }
 }

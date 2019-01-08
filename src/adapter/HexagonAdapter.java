@@ -76,6 +76,9 @@ public class HexagonAdapter extends SurfaceShape {
 	 * @return HexagonAdapter New instance of this class.
 	 */
 	public HexagonAdapter clone() {
+		Hexagon h = new Hexagon(getXcoordinate(), getYcoordinate(), getR());
+		h.setBorderColor(getColor());
+		h.setAreaColor(getInteriorColor());
 		return new HexagonAdapter(hexagon);
 	}
 	
@@ -102,7 +105,7 @@ public class HexagonAdapter extends SurfaceShape {
 	
 	@Override
 	public String toString() {
-		return "Radius length: " + hexagon.getR() + ", X: " + hexagon.getX() + ", Y: " + hexagon.getY() + ", edge color: " + getColor().toString().substring(14) + ", area color: " + getInteriorColor().toString().substring(14);
+		return "Hexagon: radius = " + hexagon.getR() + ", x = " + hexagon.getX() + ", y = " + hexagon.getY() + ", edge color = " + getColor().toString().substring(14) + ", area color = " + getInteriorColor().toString().substring(14);
 	}
 	
 	public Color getColor() {
@@ -110,6 +113,7 @@ public class HexagonAdapter extends SurfaceShape {
 	}
 	
 	public void setColor(Color color) {
+		super.setColor(color);
 		hexagon.setBorderColor(color);
 	}
 	
@@ -118,6 +122,7 @@ public class HexagonAdapter extends SurfaceShape {
 	}
 	
 	public void setInteriorColor(Color color) {
+		super.setInteriorColor(color);
 		hexagon.setAreaColor(color);
 	}
 	

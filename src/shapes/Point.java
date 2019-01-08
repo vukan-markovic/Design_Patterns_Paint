@@ -50,7 +50,7 @@ public class Point extends Shape {
      */
     @Override
     public String toString() {
-        return "X: " + xCoordinate + ", Y: " + yCoordinate + ", color: " + getColor().toString().substring(14);
+        return "Point: x = " + xCoordinate + ", y = " + yCoordinate + ", color = " + getColor().toString().substring(14);
     }
 
     /**

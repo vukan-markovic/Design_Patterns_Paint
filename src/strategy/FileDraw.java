@@ -6,11 +6,10 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-
 import model.DrawingModel;
 import shapes.Shape;
 
-public class FileDraw implements FileManager {
+public class FileDraw implements FileHandler {
 	private FileOutputStream fileOutputStream;
 	private FileInputStream fileInputStream;
 	private DrawingModel model;
@@ -22,7 +21,7 @@ public class FileDraw implements FileManager {
 	@Override
 	public void save(File file) {
 			try {
-				fileOutputStream = new FileOutputStream(file);
+				fileOutputStream = new FileOutputStream(file + ".ser");
 				ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
 				out.writeObject(model.getAll());
 				out.close();

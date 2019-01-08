@@ -16,13 +16,11 @@ public class CmdToFront implements Command {
 	private DefaultListModel<String> log;
 	private int index;
 	private String command;
-	private String shapeType;
 
-	public CmdToFront(DrawingModel model, Shape shape, DefaultListModel<String> log, String shapeType) {
+	public CmdToFront(DrawingModel model, Shape shape, DefaultListModel<String> log) {
 		this.model = model;
 		this.shape = shape;
 		this.log = log;
-		this.shapeType = shapeType;
 	}
 
 	/**
@@ -33,7 +31,7 @@ public class CmdToFront implements Command {
 		index =  model.getIndexOfShape(shape);
 		model.removeShapeAtIndex(index);
 		model.addShapeToIndex(index + 1, shape);
-		command = "To front " + shapeType + "-> " + shape.toString();
+		command = "To front " + shape.toString();
 		log.addElement(command);
 	}
 

@@ -2,15 +2,21 @@ package model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Stack;
 
+import commands.Command;
 import shapes.Shape;
 
 public class DrawingModel implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private ArrayList<Shape> shapes;
+	private Stack<Command> commands;
+	private Stack<Command> undoCommands;
 	
 	public DrawingModel() {
 		shapes = new ArrayList<Shape>();
+		commands = new Stack<Command>();
+		undoCommands = new Stack<Command>();
 	}
 	
 	public void add(Shape shape) {
@@ -55,5 +61,17 @@ public class DrawingModel implements Serializable {
 
 	public void addToIndex(Shape selectedShape, int index) {
 		shapes.add(index, selectedShape);
+	}
+
+	public void addCommand(Command command) {
+		commands.push(command);
+	}
+
+	public Stack<Command> getCommands() {
+		return commands;
+	}
+
+	public Stack<Command> getUndoCommands() {
+		return undoCommands;
 	}
 }

@@ -7,6 +7,7 @@ import controller.DrawingController;
 import model.DrawingModel;
 import strategy.FileDraw;
 import strategy.FileLog;
+import strategy.FilePicture;
 import view.DrawingView;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
@@ -30,13 +31,29 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 	private JButton btnDelete;
 	private JButton btnUndo;
 	private JButton btnRedo;
-	JButton btnNewDraw;
+	private JButton btnToFront;
+	private JButton btnToBack;
+	private JButton btnBringToFront;
+	private JButton btnBringToBack;
+	private JButton btnNewDraw;
+	private JButton btnSaveLog;
+	private JButton btnSaveDrawing;
+	private JButton btnSaveDrawingAsImage;
+	private JButton btnLog;
 	private JLabel mouseCoordinates;
 	private MouseAdapter mouseAdapterUpdate;
 	private MouseAdapter mouseAdapterDelete;
 	private MouseAdapter mouseAdapterUndo;
 	private MouseAdapter mouseAdapterRedo;
 	private MouseAdapter mouseAdapterNewDraw;
+	private MouseAdapter mouseAdapterSaveLog;
+	private MouseAdapter mouseAdapterSaveDrawing;
+	private MouseAdapter mouseAdapterSaveDrawingAsImage;
+	private MouseAdapter mouseAdapterLog;
+	private MouseAdapter mouseAdapterToFront;
+	private MouseAdapter mouseAdapterToBack;
+	private MouseAdapter mouseAdapterBringToFront;
+	private MouseAdapter mouseAdapterBringToBack;
 	private JList<String> activityLog;
 	private DefaultListModel <String> dlmList;
 	private JScrollPane scrollPane;
@@ -92,42 +109,6 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 		mainPanel.add(buttonsPanel, BorderLayout.NORTH);
 		mainPanel.add(buttonsPanelForDrawing, BorderLayout.SOUTH);
 		mainPanel.add(view, BorderLayout.CENTER);
-		
-		mouseAdapterUpdate = new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent click) {
-				controller.updateShapeClicked();
-			}
-		};
-		
-		mouseAdapterDelete = new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent click) {
-				controller.btnDeleteShapeClicked();
-			}
-		};
-		
-		mouseAdapterUndo = new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent click) {
-				controller.undo();
-			}
-		};
-		
-		mouseAdapterRedo = new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent click) {
-				controller.redo();
-			}
-		};
-		
-		mouseAdapterNewDraw = new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent click) {
-				controller.newDraw();
-			}
-		};
-
 		buttonsGroup = new ButtonGroup();
 
 		JToggleButton tglBtnDrawPoint = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/icon.png")));
@@ -190,44 +171,41 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 		tglBtnDrawHexagon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		buttonsPanelForDrawing.add(tglBtnDrawHexagon);
 		
-		JButton btnSaveLog = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/log.png")));
+		btnSaveLog = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/log.png")));
+		btnSaveLog.setEnabled(false);
 		btnSaveLog.setBackground(new Color(154, 205, 50));
 		btnSaveLog.setText("Save log");
 		btnSaveLog.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		buttonsPanelForDrawing.add(btnSaveLog);
 		
-		JButton btnSaveDrawingAsImage = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/save-drawing.png")));
+		btnSaveDrawingAsImage = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/save-drawing.png")));
+		btnSaveDrawingAsImage.setEnabled(false);
 		btnSaveDrawingAsImage.setBackground(new Color(144, 238, 144));
 		btnSaveDrawingAsImage.setText("Save as picture");
 		btnSaveDrawingAsImage.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		buttonsPanelForDrawing.add(btnSaveDrawingAsImage);
 		
-		JButton btnSaveDrawing = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/save.png")));
+		btnSaveDrawing = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/save.png")));
+		btnSaveDrawing.setEnabled(false);
 		btnSaveDrawing.setBackground(new Color(255, 222, 173));
 		btnSaveDrawing.setText("Save draw");
 		btnSaveDrawing.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		buttonsPanelForDrawing.add(btnSaveDrawing);
 		
 		btnNewDraw = new JButton("New draw");
+		btnNewDraw.setEnabled(false);
 		btnNewDraw.setBackground(new Color(222, 184, 135));
 		btnNewDraw.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnNewDraw.setEnabled(false);
 		buttonsPanelForDrawing.add(btnNewDraw);
 		
 		JButton btnOpenDrawLog = new JButton("Open draw/log");
-		btnOpenDrawLog.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				controller.open();
-			}
-		});
 		btnOpenDrawLog.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		buttonsPanelForDrawing.add(btnOpenDrawLog);
-		
 		mouseCoordinates = new JLabel("X:0, Y:0");
 		buttonsPanelForDrawing.add(mouseCoordinates);
 		
-		JButton btnLog = new JButton("Log");
+		btnLog = new JButton("Log");
 		btnLog.setForeground(Color.RED);
 		btnLog.setFont(new Font("Lucida Console", Font.BOLD, 12));
 		btnLog.setBackground(Color.ORANGE);
@@ -280,28 +258,32 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 		btnRedo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		buttonsPanel.add(btnRedo);
 		
-		JButton btnToFront = new JButton("ToFront");
+		btnToFront = new JButton("ToFront");
 		btnToFront.setForeground(Color.RED);
+		btnToFront.setEnabled(false);
 		btnToFront.setFont(new Font("Lucida Console", Font.BOLD, 11));
 		btnToFront.setBackground(Color.GREEN);
 		btnToFront.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		buttonsPanel.add(btnToFront);
 		
-		JButton btnToBack = new JButton("ToBack");
+		btnToBack = new JButton("ToBack");
 		btnToBack.setFont(new Font("Lucida Console", Font.BOLD, 11));
+		btnToBack.setEnabled(false);
 		btnToBack.setForeground(Color.RED);
 		btnToBack.setBackground(Color.BLUE);
 		btnToBack.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		buttonsPanel.add(btnToBack);
 		
-		JButton btnBringToFront = new JButton("BringToFront");
+		btnBringToFront = new JButton("BringToFront");
 		btnBringToFront.setForeground(Color.RED);
+		btnBringToFront.setEnabled(false);
 		btnBringToFront.setFont(new Font("Lucida Console", Font.BOLD, 11));
 		btnBringToFront.setBackground(Color.PINK);
 		btnBringToFront.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		buttonsPanel.add(btnBringToFront);
 		
-		JButton btnBringToBack = new JButton("BringToBack");
+		btnBringToBack = new JButton("BringToBack");
+		btnBringToBack.setEnabled(false);
 		btnBringToBack.setForeground(Color.RED);
 		btnBringToBack.setFont(new Font("Lucida Console", Font.BOLD, 11));
 		btnBringToBack.setBackground(Color.ORANGE);
@@ -314,8 +296,92 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 		activityLog.setBackground(Color.ORANGE);
 		activityLog.setFont(new Font("Lucida Console", Font.BOLD, 12));
 		scrollPane.setViewportView(activityLog);
+
+		mouseAdapterUpdate = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
+				controller.updateShapeClicked();
+			}
+		};
 		
-		btnLog.addMouseListener(new MouseAdapter() {
+		mouseAdapterDelete = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
+				controller.btnDeleteShapeClicked();
+			}
+		};
+		
+		mouseAdapterUndo = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
+				controller.undo();
+			}
+		};
+		
+		mouseAdapterRedo = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
+				controller.redo();
+			}
+		};
+		
+		mouseAdapterNewDraw = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
+				controller.newDraw();
+			}
+		};
+		
+		mouseAdapterBringToBack = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
+				controller.bringToBack();
+			}
+		};
+		
+		mouseAdapterBringToFront = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
+				controller.bringToFront();
+			}
+		};
+		
+		mouseAdapterToBack = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
+				controller.toBack();
+			}
+		};
+		
+		mouseAdapterToFront = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
+				controller.toFront();
+			}
+		};
+		
+		mouseAdapterSaveDrawing = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
+				controller.save(new FileDraw(getView().getModel()));
+			}
+		};
+
+		mouseAdapterSaveDrawingAsImage = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
+				controller.save(new FilePicture(getFrame()));
+			}
+		};
+		
+		mouseAdapterSaveLog = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
+				controller.save(new FileLog(getFrame()));
+			}
+		};
+		
+		mouseAdapterLog = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent click) {
 				if (btnLog.getText().equals("Log")) {
@@ -331,8 +397,8 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 				
 				repaint();
 			}
-		});
-
+		};
+		
 		btnEdgeColor.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent click) {
@@ -349,27 +415,13 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 			}
 		});
 		
-		btnSaveLog.addMouseListener(new MouseAdapter() {
+		btnOpenDrawLog.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				controller.save(new FileLog(getFrame()));
+				controller.open();
 			}
 		});
-		
-		btnSaveDrawingAsImage.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				controller.saveDrawAsImage();
-			}
-		});
-		
-		btnSaveDrawing.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				controller.save(new FileDraw(getView().getModel()));
-			}
-		});
-
+	
 		view.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent click) {
@@ -387,30 +439,6 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				mouseCoordinates.setText("X:" + e.getX() + ", Y:" + e.getY());
-			}
-		});
-		
-		btnToFront.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				controller.toFront();
-			}
-		});
-		
-		btnBringToFront.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				controller.bringToFront();
-			}
-		});
-		
-		btnToBack.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				controller.ToBack();
-			}
-		});
-		
-		btnBringToBack.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				controller.BringToBack();
 			}
 		});
 	}
@@ -432,81 +460,56 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 		return view;
 	}
 	
-	public void updateAddListener() {
-		btnUpdate.setEnabled(true);
-		btnUpdate.addMouseListener(mouseAdapterUpdate);
+	public void addListener(JButton button, MouseAdapter adapter) {
+		button.setEnabled(true);
+		button.addMouseListener(adapter);
 	}
 	
-	public void deleteAddListener() {
-		btnDelete.setEnabled(true);
-		btnDelete.addMouseListener(mouseAdapterDelete);
-	}
-	
-	public void updateRemoveListener() {
-		btnUpdate.removeMouseListener(mouseAdapterUpdate);
-		btnUpdate.setEnabled(false);
-	}
-	
-	public void deleteRemoveListener() {
-		btnDelete.removeMouseListener(mouseAdapterDelete);
-		btnDelete.setEnabled(false);
-	}
-	
-	public void undoAddListener() {
-		btnUndo.setEnabled(true);
-		btnUndo.addMouseListener(mouseAdapterUndo);
-	}
-	
-	public void redoAddListener() {
-		btnRedo.setEnabled(true);
-		btnRedo.addMouseListener(mouseAdapterRedo);
-	}
-	
-	public void undoRemoveListener() {
-		btnUndo.removeMouseListener(mouseAdapterUndo);
-		btnUndo.setEnabled(false);
-	}
-	
-	public void redoRemoveListener() {
-		btnRedo.removeMouseListener(mouseAdapterRedo);
-		btnRedo.setEnabled(false);
-	}
-
-	public void newDrawAddListener() {
-		btnNewDraw.setEnabled(true);
-		btnNewDraw.addMouseListener(mouseAdapterNewDraw);
-	}
-	
-	public void newDrawRemoveListener() {
-		btnNewDraw.removeMouseListener(mouseAdapterNewDraw);
-		btnNewDraw.setEnabled(false);
+	public void removeListener(JButton button, MouseAdapter adapter) {
+		button.removeMouseListener(adapter);
+		button.setEnabled(false);
 	}
 	
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (evt.getPropertyName().equals("shape selected")) {
-			deleteAddListener();
+			addListener(btnDelete, mouseAdapterDelete);
 		} else if (evt.getPropertyName().equals("shape exist")) {
 			tglBtnSelect.setEnabled(true);
-			newDrawAddListener();
-			undoAddListener();
+			addListener(btnNewDraw, mouseAdapterNewDraw);
+			addListener(btnUndo, mouseAdapterUndo);
+			addListener(btnSaveDrawing, mouseAdapterSaveDrawing);
+			addListener(btnSaveLog, mouseAdapterSaveLog);
+			addListener(btnSaveDrawingAsImage, mouseAdapterSaveDrawingAsImage);
+			addListener(btnLog, mouseAdapterLog);
 		}
 		else if (evt.getPropertyName().equals("shape unselected") || evt.getPropertyName().equals("shape don't exist")) {
-			updateRemoveListener();
-			deleteRemoveListener();
-		} else if (evt.getPropertyName().equals("shape don't exist")) {
+			removeListener(btnUpdate, mouseAdapterUpdate);
+			removeListener(btnDelete, mouseAdapterDelete);
+		} else if (evt.getPropertyName().equals("shape don't exist") || evt.getPropertyName().equals("undo turn off")) {
 			tglBtnSelect.setEnabled(false);
-			tglBtnSelect.removeMouseListener(new MouseAdapter() {});
-			newDrawRemoveListener();
-			updateRemoveListener();
-			deleteRemoveListener();
-			undoRemoveListener();
-			redoRemoveListener();
+			removeListener(btnNewDraw, mouseAdapterNewDraw);
+			removeListener(btnUndo, mouseAdapterUndo);
+			removeListener(btnSaveDrawing, mouseAdapterSaveDrawing);
+			removeListener(btnSaveLog, mouseAdapterSaveLog);
+			removeListener(btnSaveDrawingAsImage, mouseAdapterSaveDrawingAsImage);
+			removeListener(btnLog, mouseAdapterLog);
+			removeListener(btnToBack, mouseAdapterToBack);
+			removeListener(btnToFront, mouseAdapterToFront);
+			removeListener(btnBringToBack, mouseAdapterBringToBack);
+			removeListener(btnBringToFront, mouseAdapterBringToFront);
 		}
-		else if (evt.getPropertyName().equals("update turn off")) updateRemoveListener();
-		else if (evt.getPropertyName().equals("update turn on")) updateAddListener();
-		else if (evt.getPropertyName().equals("redo turn off")) redoRemoveListener();
-		else if (evt.getPropertyName().equals("redo turn on")) redoAddListener();
+		else if (evt.getPropertyName().equals("update turn off")) removeListener(btnUpdate, mouseAdapterUpdate);
+		else if (evt.getPropertyName().equals("update turn on")) addListener(btnUpdate, mouseAdapterUpdate);
+		else if (evt.getPropertyName().equals("redo turn off")) removeListener(btnRedo, mouseAdapterRedo);
+		else if (evt.getPropertyName().equals("redo turn on")) addListener(btnRedo, mouseAdapterRedo);
+		else if (evt.getPropertyName().equals("undo turn on")) addListener(btnUndo, mouseAdapterUndo);
+		else if (evt.getPropertyName().equals("change position turn on")) {
+			addListener(btnToBack, mouseAdapterToBack);
+			addListener(btnToFront, mouseAdapterToFront);
+			addListener(btnBringToBack, mouseAdapterBringToBack);
+			addListener(btnBringToFront, mouseAdapterBringToFront);
+		}
 	}
 	
 	public DefaultListModel<String> getList() {

@@ -26,7 +26,7 @@ public class CmdRemoveShape implements Command {
 		commands = new ArrayList<String>();
 		Iterator<Shape> it = shapes.iterator();
 		while (it.hasNext()) {
-			commands.add("Deleted point-> " + it.next().toString());	
+			commands.add("Deleted " + it.next().toString());	
 		}
 	}
 

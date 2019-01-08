@@ -21,7 +21,7 @@ public class CmdUpdatePoint implements Command {
 		this.newState = newState;
 		this.log = log;
 		originalState = oldState.clone();
-		command = "Updated point" + " from-> " + oldState.toString() + " to-> " + newState.toString();
+		command = "Updated point from " + oldState.toString() + " to " + newState.toString();
 	}
 	
 	/**

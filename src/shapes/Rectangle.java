@@ -85,7 +85,7 @@ public class Rectangle extends Square {
     }
 
     public Rectangle clone() {
-    	return new Rectangle(new Point(upLeft.getXcoordinate(), upLeft.getYcoordinate(), upLeft.getColor()), width, side, getColor(), getInteriorColor());
+    	return new Rectangle(upLeft.clone(), width, side, getColor(), getInteriorColor());
     }
     
     /**
@@ -104,6 +104,6 @@ public class Rectangle extends Square {
     
     @Override
     public String toString() {
-    	return "Up left point: " + upLeft + ", Height: " + side + ", Width: " + width + ", edge color: " + getColor().toString().substring(14) + ", area color: " + getInteriorColor().toString().substring(14);
+    	return "Rectangle: up left point = " + upLeft + ", height = " + side + ", width = " + width + ", edge color = " + getColor().toString().substring(14) + ", area color = " + getInteriorColor().toString().substring(14);
     }
 }

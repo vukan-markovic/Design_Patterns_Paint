@@ -16,11 +16,11 @@ public class CmdAddShape implements Command {
 	private DefaultListModel<String> log;
 	private String command;
 	
-	public CmdAddShape(Shape shape, DrawingModel model, DefaultListModel<String> log, String shapeType) {
+	public CmdAddShape(Shape shape, DrawingModel model, DefaultListModel<String> log) {
 		this.shape = shape;
 		this.model = model;
 		this.log = log;
-		command = "Added " + shapeType + "-> " + shape.toString();
+		command = "Added " + shape.toString();
 	}
 	
 	/**
