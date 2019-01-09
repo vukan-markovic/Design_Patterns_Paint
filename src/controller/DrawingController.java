@@ -38,9 +38,9 @@ import model.DrawingModel;
 import shapes.Circle;
 import shapes.Square;
 import strategy.FileDraw;
-import strategy.FileHandler;
 import strategy.FileLog;
 import strategy.FileManager;
+import strategy.FilePicture;
 import view.DrawingView;
 import shapes.Line;
 import shapes.Point;
@@ -253,9 +253,12 @@ public class DrawingController {
 		if (counter == 1)  {
 			propertyChangeSupport.firePropertyChange("update turn on", false, true);
 			propertyChangeSupport.firePropertyChange("shape selected", false, true);
-		} 
-		else if (counter > 1) propertyChangeSupport.firePropertyChange("update turn off", false, true);
-		
+		}  
+		else if (counter > 1) {
+			propertyChangeSupport.firePropertyChange("update turn off", false, true);
+			propertyChangeSupport.firePropertyChange("change position turn off", false, true);
+		}
+		if (counter == 1 && model.getAll().size() >= 2) propertyChangeSupport.firePropertyChange("change position turn on", false, true);
 		if (!selected) unselect();
 		else selected = false;
 		frame.getView().repaint();	
@@ -264,6 +267,7 @@ public class DrawingController {
 	public void unselect() {
 		Iterator<Shape> shapesIterator = model.getAll().iterator();
 		propertyChangeSupport.firePropertyChange("shape unselected", false, true);
+		propertyChangeSupport.firePropertyChange("change position turn off", false, true);
 		
 		while(shapesIterator.hasNext()) {
 			Shape shapeForSelection = shapesIterator.next();
@@ -370,19 +374,22 @@ public class DrawingController {
 			propertyChangeSupport.firePropertyChange("redo turn off", false, true);
 		}
 		
+		if (frame.getList().size() == 1) propertyChangeSupport.firePropertyChange("log turn on", false, true);
+		
 		if (model.getAll().isEmpty()) {
 			propertyChangeSupport.firePropertyChange("shape don't exist", false, true);
-		} else if (model.getAll().size() == 1) {
+		} else if (model.getAll().size() == 1) 
 			propertyChangeSupport.firePropertyChange("shape exist", false, true);
-			propertyChangeSupport.firePropertyChange("change position turn off", false, true);
-		} else if (model.getAll().size() == 2) propertyChangeSupport.firePropertyChange("change position turn on", false, true);
 		
+		if (model.getAll().isEmpty() && model.getCommands().isEmpty()) propertyChangeSupport.firePropertyChange("draw is empty", false, true);
+		else propertyChangeSupport.firePropertyChange("draw is not empty", false, true);
 		frame.getView().repaint();
 	}
 	
 	public void undo() {
 		model.getCommands().peek().unexecute();
 		model.getUndoCommands().push(model.getCommands().pop());
+		if (frame.getList().isEmpty()) propertyChangeSupport.firePropertyChange("log turn off", false, true);
 		if (model.getUndoCommands().size() == 1) propertyChangeSupport.firePropertyChange("redo turn on", false, true);
 		if (model.getCommands().isEmpty()) propertyChangeSupport.firePropertyChange("undo turn off", false, true);
 		frame.getView().repaint();
@@ -393,11 +400,12 @@ public class DrawingController {
 		model.getCommands().push(model.getUndoCommands().pop());
 		if (model.getUndoCommands().isEmpty()) propertyChangeSupport.firePropertyChange("redo turn off", false, true);
 		if (model.getCommands().size() == 1) propertyChangeSupport.firePropertyChange("shape exist", false, true);
+		if (!model.getCommands().isEmpty()) propertyChangeSupport.firePropertyChange("draw is not empty", false, true);
 		frame.getView().repaint();
 	}
 	
-	public void save(FileHandler fileHandler) {
-		fileManager = new FileManager(fileHandler);
+	public void save() {
+		chooser = new JFileChooser();
 		chooser.setFileSelectionMode(JFileChooser.SAVE_DIALOG);
 	    chooser.setFileSelectionMode(JFileChooser.FILES_ONLY); 
 		chooser.enableInputMethods(false);
@@ -405,21 +413,37 @@ public class DrawingController {
 		chooser.setFileHidingEnabled(false);
 		chooser.setEnabled(true);
 		chooser.setDialogTitle("Save");
-		if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) fileManager.save(chooser.getSelectedFile());
+		chooser.setAcceptAllFileFilterUsed(false);
+		if (!model.getAll().isEmpty()) {
+			chooser.setFileFilter(new FileNameExtensionFilter("Serialized draw", "ser"));
+			chooser.setFileFilter(new FileNameExtensionFilter("Picture", "jpeg"));
+		}
+		if (!model.getCommands().isEmpty()) chooser.setFileFilter(new FileNameExtensionFilter("Commands log", "log"));
+		if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+			if (chooser.getFileFilter().getDescription().equals("Serialized draw")) fileManager = new FileManager(new FileDraw(model));
+			else if (chooser.getFileFilter().getDescription().equals("Commands log")) fileManager = new FileManager(new FileLog(frame));
+			else fileManager = new FileManager(new FilePicture(frame));
+			fileManager.save(chooser.getSelectedFile());
+		}
 	}
-	
+
 	public void open() {
 		chooser.enableInputMethods(true);
 		chooser.setMultiSelectionEnabled(false);
 		chooser.setFileHidingEnabled(false);
 		chooser.setEnabled(true);
+		chooser.setAcceptAllFileFilterUsed(false);
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		chooser.setFileFilter(new FileNameExtensionFilter("Serialized draw", "ser"));
+		chooser.setFileFilter(new FileNameExtensionFilter("Commands log", "log"));
 		if(chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 			model.removeAll();
-			if (chooser.getSelectedFile().getName().split(".")[1].equals("log")) fileManager = new FileManager(new FileLog(frame));
-			else fileManager = new FileManager(new FileDraw(model));
+			if (chooser.getFileFilter().getDescription().equals("Serialized draw")) {
+				fileManager = new FileManager(new FileDraw(model));
+				frame.getView().repaint();
+			}
+			else if (chooser.getFileFilter().getDescription().equals("Commands log")) fileManager = new FileManager(new FileLog(frame));
 			fileManager.open(chooser.getSelectedFile());
-			frame.getView().repaint();
 		}	
 	}
 
@@ -430,19 +454,27 @@ public class DrawingController {
 	}
 
 	public void toFront() {
-		executeCommand(new CmdToFront(model, getSelectedShape(), log));
+		Shape shape = getSelectedShape();
+		if (model.getIndexOfShape(shape) == model.getAll().size() - 1) JOptionPane.showMessageDialog(null, "Shape is on top!");
+		else executeCommand(new CmdToFront(model, shape, log));
 	}
 
 	public void bringToFront() {
-		executeCommand(new CmdBringToFront(model, getSelectedShape(), log));
+		Shape shape = getSelectedShape();
+		if (model.getIndexOfShape(shape) == model.getAll().size() - 1) JOptionPane.showMessageDialog(null, "Shape is already on top!");
+		else executeCommand(new CmdBringToFront(model, shape, log));
 	}
 
 	public void toBack() {
-		executeCommand(new CmdToBack(model, getSelectedShape(), log));
+		Shape shape = getSelectedShape();
+		if (model.getIndexOfShape(shape) == 0) JOptionPane.showMessageDialog(null, "Shape is on first place!");
+		else executeCommand(new CmdToBack(model, shape, log));
 	}
 
 	public void bringToBack() {
-		executeCommand(new CmdBringToBack(model, getSelectedShape(), log));
+		Shape shape = getSelectedShape();
+		if (model.getIndexOfShape(shape) == 0) JOptionPane.showMessageDialog(null, "Shape is already on first place!");
+		else executeCommand(new CmdBringToBack(model, shape, log));
 	}
 	
 	public void updateShapeClicked() {
