@@ -21,7 +21,7 @@ public class CmdUpdateHexagon implements Command {
 		this.newState = newState;
 		this.log = log;
 		originalState = oldState.clone();
-		command = "Updated hexagon from " + oldState.toString() + " to " + newState.toString();
+		command = "Updated->" + oldState.toString() + "->" + newState.toString();
 	}
 	
 	/**

@@ -29,6 +29,16 @@ public class HexagonAdapter extends SurfaceShape {
 		hexagon.setSelected(isSelected());
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof HexagonAdapter) {
+			Hexagon hexaFromObj = ((HexagonAdapter) obj).hexagon;
+			return hexagon.getX() == hexaFromObj.getX() && hexagon.getY() == hexaFromObj.getY()
+					&& hexagon.getR() == hexaFromObj.getR();
+		}
+		return false;
+	}
+	
 	/**
 	 * Implemented in {@link #draw(Graphics)}.
 	 * 
@@ -105,7 +115,7 @@ public class HexagonAdapter extends SurfaceShape {
 	
 	@Override
 	public String toString() {
-		return "Hexagon: radius = " + hexagon.getR() + ", x = " + hexagon.getX() + ", y = " + hexagon.getY() + ", edge color = " + getColor().toString().substring(14) + ", area color = " + getInteriorColor().toString().substring(14);
+		return "Hexagon: radius=" + hexagon.getR() + "; x=" + hexagon.getX() + "; y=" + hexagon.getY() + "; edge color=" + getColor().toString().substring(14).replace('=', '-') + "; area color=" + getInteriorColor().toString().substring(14).replace('=', '-');
 	}
 	
 	public Color getColor() {

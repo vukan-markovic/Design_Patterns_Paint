@@ -66,12 +66,32 @@ public class DrawingModel implements Serializable {
 	public void addCommand(Command command) {
 		commands.push(command);
 	}
-
-	public Stack<Command> getCommands() {
-		return commands;
+	
+	public void addUndoCommand(Command command) {
+		undoCommands.add(command);
+	}
+	
+	public Command removeCommand() {
+		return commands.pop();
+	}
+	
+	public Command removeUndoCommand() {
+		return undoCommands.pop();
 	}
 
+	public Command getLastCommand() {
+		return commands.peek();
+	}
+	
+	public Command getLastUndoCommand() {
+		return undoCommands.peek();
+	}
+	
 	public Stack<Command> getUndoCommands() {
 		return undoCommands;
+	}
+	
+	public Stack<Command> getCommands() {
+		return commands;
 	}
 }

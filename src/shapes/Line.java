@@ -41,8 +41,16 @@ public class Line extends Shape {
      * @param x
      * @param y
      */
-    public void moveTo(int x, int y) {
-    }
+    public void moveTo(int x, int y) {}
+    
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Line) {
+			Line castedObj = (Line) obj;
+			return initial.equals(castedObj.initial) && last.equals(castedObj.last);
+		}
+		return false;
+	}
 
     /**
      * @return
@@ -121,6 +129,6 @@ public class Line extends Shape {
     
     @Override
     public String toString() {
-    	return "Line: start point = " + initial.toString() + ", end point = " + last.toString() + ", color = " + getColor().toString().substring(14);
+    	return "Line: start point x=" + initial.getXcoordinate() + "; start point y=" + initial.getYcoordinate() + "; end point x=" + last.getXcoordinate() + "; end point y=" + last.getYcoordinate() + "; color=" + getColor().toString().substring(14).replace('=', '-');
     }
 }

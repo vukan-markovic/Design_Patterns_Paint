@@ -45,12 +45,21 @@ public class Point extends Shape {
         return Math.sqrt(Math.pow(xCoordinate - point.xCoordinate, 2) + Math.pow(yCoordinate - point.yCoordinate, 2));
     }
 
+    @Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Point) {
+			Point castedObj = (Point) obj;
+			return xCoordinate == castedObj.getXcoordinate() && yCoordinate == castedObj.getYcoordinate();
+		}
+		return false;
+	}
+    
     /**
      * @return
      */
     @Override
     public String toString() {
-        return "Point: x = " + xCoordinate + ", y = " + yCoordinate + ", color = " + getColor().toString().substring(14);
+        return "Point: x=" + xCoordinate + "; y=" + yCoordinate + "; color=" + getColor().toString().substring(14).replace('=', '-');
     }
 
     /**

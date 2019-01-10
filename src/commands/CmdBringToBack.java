@@ -31,7 +31,7 @@ public class CmdBringToBack implements Command {
 		index =  model.getIndexOfShape(shape);
 		model.removeShapeAtIndex(index);
 		model.addShapeToIndex(0, shape);
-		command = "Bring to back " + shape.toString();
+		command = "Bringed to back->" + shape.toString();
 		log.addElement(command);
 	}
 

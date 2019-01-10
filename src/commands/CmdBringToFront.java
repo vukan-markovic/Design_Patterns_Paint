@@ -31,7 +31,7 @@ public class CmdBringToFront implements Command {
 		index =  model.getIndexOfShape(shape);
 		model.removeShapeAtIndex(index);
 		model.addShapeToIndex(model.getAll().size() - 1, shape);
-		command = "Bring to front " + shape.toString();
+		command = "Bringed to front->" + shape.toString();
 		log.addElement(command);
 	}
 

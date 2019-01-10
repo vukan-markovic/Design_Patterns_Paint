@@ -18,10 +18,6 @@ public class DrawingView extends JPanel {
 	public void setModel(DrawingModel model) {
 		this.model = model;
 	}
-	
-	public DrawingModel getModel() {
-		return model;
-	}
 
 	@Override
 	public void paint(Graphics g) {

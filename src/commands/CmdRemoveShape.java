@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.swing.DefaultListModel;
 import model.DrawingModel;
+import shapes.Point;
 import shapes.Shape;
 
 /**
@@ -15,6 +16,7 @@ import shapes.Shape;
  */
 public class CmdRemoveShape implements Command {
 	private ArrayList<Shape> shapes;
+	private Shape shape;
 	private DrawingModel model;
 	private DefaultListModel<String> log;
 	private List<String> commands;
@@ -25,9 +27,15 @@ public class CmdRemoveShape implements Command {
 		this.log = log;
 		commands = new ArrayList<String>();
 		Iterator<Shape> it = shapes.iterator();
-		while (it.hasNext()) {
-			commands.add("Deleted " + it.next().toString());	
-		}
+		while (it.hasNext()) commands.add("Deleted->" + it.next().toString());	
+	}
+	
+	public CmdRemoveShape(Shape shape, DrawingModel model, DefaultListModel<String> log) {
+		this.shape = shape;
+		this.model = model;
+		this.log = log;
+		commands = new ArrayList<String>();
+		commands.add("Deleted->" + shape.toString());	
 	}
 
 	/**
@@ -35,7 +43,10 @@ public class CmdRemoveShape implements Command {
 	 */
 	@Override
 	public void execute() { 
-		if (!model.getAll().isEmpty()) model.removeMultiple(shapes);
+		if (!model.getAll().isEmpty()) {
+			if (shapes != null) model.removeMultiple(shapes);
+			else model.remove((Point)shape);
+		}
 		log.addAll(commands);
 	}
 
@@ -44,7 +55,8 @@ public class CmdRemoveShape implements Command {
 	 */
 	@Override
 	public void unexecute() {
-		model.addMultiple(shapes);
+		if (shapes != null) model.addMultiple(shapes);
+		else model.add(shape);
 		Iterator<String> it = commands.iterator();
 		while (it.hasNext()) log.removeElement(it.next());
 	}

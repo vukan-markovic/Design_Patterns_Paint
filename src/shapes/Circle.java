@@ -39,6 +39,14 @@ public class Circle extends SurfaceShape {
         center.moveTo(xCoordinate, yCoordinate);
     }
     
+    @Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Circle) {
+			Circle castedObj = (Circle) obj;
+			return center.equals(castedObj.getCenter()) && radius == castedObj.getRadius();
+		}
+		return false;
+	}
 
     /**
      * @param g
@@ -111,6 +119,6 @@ public class Circle extends SurfaceShape {
     
     @Override
     public String toString() {
-    	return "Circle: radius = " + radius + ", center = " + center.toString() + ", edge color = " + getColor().toString().substring(14) + ", area color = " + getInteriorColor().toString().substring(14);
+    	return "Circle: radius=" + radius + "; x=" + center.getXcoordinate() + "; y=" + center.getYcoordinate() + "; edge color=" + getColor().toString().substring(14).replace('=', '-') + "; area color=" + getInteriorColor().toString().substring(14).replace('=', '-');
     }
 }

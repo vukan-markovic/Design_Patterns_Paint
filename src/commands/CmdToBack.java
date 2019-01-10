@@ -31,7 +31,7 @@ public class CmdToBack implements Command {
 		index =  model.getIndexOfShape(shape);
 		model.removeShapeAtIndex(index);
 		model.addShapeToIndex(index - 1, shape);
-		command = "To back " + shape.toString();
+		command = "Moved to back->" + shape.toString();
 		log.addElement(command);
 	}
 

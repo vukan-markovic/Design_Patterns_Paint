@@ -40,6 +40,16 @@ public class Rectangle extends Square {
     public Line diagonal() {
         return new Line(upLeft, new Point(upLeft.getXcoordinate() + side, upLeft.getYcoordinate() + width));
     }
+    
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Rectangle) {
+			Rectangle castedObj = (Rectangle) obj;
+			return upLeft.equals(castedObj.upLeft) && width == castedObj.getWidth()
+					&& side == castedObj.side;
+		}
+		return false;
+	}
 
     /**
      * @param g
@@ -104,6 +114,6 @@ public class Rectangle extends Square {
     
     @Override
     public String toString() {
-    	return "Rectangle: up left point = " + upLeft + ", height = " + side + ", width = " + width + ", edge color = " + getColor().toString().substring(14) + ", area color = " + getInteriorColor().toString().substring(14);
+    	return "Rectangle: x=" + upLeft.getXcoordinate() + "; y=" + upLeft.getYcoordinate() + "; height=" + side + "; width=" + width + "; edge color=" + getColor().toString().substring(14).replace('=', '-') + "; area color=" + getInteriorColor().toString().substring(14).replace('=', '-');
     }
 }

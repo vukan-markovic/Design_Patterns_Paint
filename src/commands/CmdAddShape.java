@@ -20,7 +20,7 @@ public class CmdAddShape implements Command {
 		this.shape = shape;
 		this.model = model;
 		this.log = log;
-		command = "Added " + shape.toString();
+		command = "Added->" + shape.toString();
 	}
 	
 	/**

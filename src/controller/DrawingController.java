@@ -59,8 +59,8 @@ public class DrawingController {
 	private Point initialPointOfLine;
 	private Color edgeColor = Color.BLACK;
 	private Color interiorColor = Color.WHITE;
-	private Color currentEdgeColor = Color.BLACK;
-	private Color currentInteriorColor = Color.WHITE;
+	private Color choosenEdgeColor;
+	private Color choosenInteriorColor;
 	private PropertyChangeSupport propertyChangeSupport;
 	private int counter = 0;
 	private boolean selected;
@@ -92,9 +92,16 @@ public class DrawingController {
 	 * @return Color that user choose.
 	 */
 	public Color btnEdgeColorClicked() {
-		edgeColor = JColorChooser.showDialog(null, "Colors pallete", currentEdgeColor);
-		currentEdgeColor = edgeColor;
-		return currentEdgeColor;
+		choosenEdgeColor = JColorChooser.showDialog(null, "Colors pallete", edgeColor);
+		if (choosenEdgeColor != null) {
+			if (choosenEdgeColor.equals(Color.WHITE)) {
+				JOptionPane.showMessageDialog(null, "Background is white :D");
+				return null;
+			}
+			edgeColor = choosenEdgeColor;
+			return edgeColor;
+		}
+		return choosenEdgeColor;
 	}
 	
 	/**
@@ -103,9 +110,12 @@ public class DrawingController {
 	 * @return Color that user choose.
 	 */
 	public Color btnInteriorColorClicked() {
-		interiorColor = JColorChooser.showDialog(null, "Colors pallete", currentInteriorColor);
-		currentInteriorColor = interiorColor;
-		return currentInteriorColor;
+		choosenInteriorColor = JColorChooser.showDialog(null, "Colors pallete", interiorColor);
+		if (choosenInteriorColor != null) {
+			interiorColor = choosenInteriorColor;
+			return interiorColor;
+		}
+		return choosenEdgeColor;
 	}
 	
 	/**
@@ -150,10 +160,11 @@ public class DrawingController {
 		square.deleteButtons();
 		square.setVisible(true);
 		if (square.isConfirmed()) {
-			if (square.getWidth() + click.getX() > frame.getView().getWidth() || square.getWidth() + click.getY() > frame.getView().getHeight() || click.getY() - square.getWidth() <= 0 || click.getX() - square.getWidth() < 0)
+			if (square.getSideLength() + click.getX() > frame.getView().getWidth() || square.getSideLength() + click.getY() > frame.getView().getHeight() || click.getY() - square.getSideLength() <= 0 || click.getX() - square.getSideLength() < 0) {
 				JOptionPane.showMessageDialog(null, "The square goes out of drawing!");
-			else 
-				executeCommand(new CmdAddShape(new Square(new Point(click.getX(), click.getY()), square.getSideLength(), edgeColor, interiorColor), model, log));
+				square.write(click.getX(),click.getY());
+				square.setVisible(true);
+			} else executeCommand(new CmdAddShape(new Square(new Point(click.getX(), click.getY()), square.getSideLength(), edgeColor, interiorColor), model, log));
 		}
 	}
 	
@@ -172,10 +183,11 @@ public class DrawingController {
 		rectangle.deleteButtons();
 		rectangle.setVisible(true);
 		if (rectangle.isConfirmed()) {
-			if (rectangle.getWidth() + click.getX() > frame.getView().getWidth() || rectangle.getHeight() + click.getY() > frame.getView().getHeight() || click.getY() - rectangle.getHeight() <= 0 || click.getX() - rectangle.getWidth() < 0)
+			if (rectangle.getRectangleWidth() + click.getX() > frame.getView().getWidth() || rectangle.getRectangleHeight() + click.getY() > frame.getView().getHeight() || click.getY() - rectangle.getRectangleHeight() <= 0 || click.getX() - rectangle.getRectangleWidth() < 0) {
 				JOptionPane.showMessageDialog(null, "The rectangle goes out of drawing!");
-			else
-				executeCommand(new CmdAddShape(new Rectangle(new Point(click.getX(), click.getY()), rectangle.getRectangleWidth(), rectangle.getRectangleHeight(), edgeColor, interiorColor), model, log));
+				rectangle.write(click.getX(), click.getY());
+				rectangle.setVisible(true);
+			} else executeCommand(new CmdAddShape(new Rectangle(new Point(click.getX(), click.getY()), rectangle.getRectangleWidth(), rectangle.getRectangleHeight(), edgeColor, interiorColor), model, log));
 		}
 	}
 	
@@ -194,10 +206,11 @@ public class DrawingController {
 		circle.deleteButtons();
 		circle.setVisible(true);
 		if (circle.isConfirmed()) {
-			if (circle.getRadiusLength() + click.getX() > frame.getView().getWidth() || circle.getRadiusLength() + click.getY() > frame.getView().getHeight() || click.getY() - circle.getRadiusLength() <= 0 || click.getX() - circle.getRadiusLength() < 0)
+			if (circle.getRadiusLength() + click.getX() > frame.getView().getWidth() || circle.getRadiusLength() + click.getY() > frame.getView().getHeight() || click.getY() - circle.getRadiusLength() <= 0 || click.getX() - circle.getRadiusLength() < 0) {
 				JOptionPane.showMessageDialog(null, "The circle goes out of drawing!");
-			else 
-				executeCommand(new CmdAddShape(new Circle(new Point(click.getX(), click.getY()), circle.getRadiusLength(), edgeColor, interiorColor), model, log));
+				circle.write(click.getX(), click.getY());
+				circle.setVisible(true);
+			} else executeCommand(new CmdAddShape(new Circle(new Point(click.getX(), click.getY()), circle.getRadiusLength(), edgeColor, interiorColor), model, log));
 		}
 	}
 	
@@ -216,9 +229,11 @@ public class DrawingController {
 		dlgHexagon.deleteButtons();
 		dlgHexagon.setVisible(true);
 		if (dlgHexagon.isConfirmed()) {
-			if (dlgHexagon.getRadiusLength() + click.getX() > frame.getView().getWidth() || dlgHexagon.getRadiusLength() + click.getY() > frame.getView().getHeight() || click.getY() - dlgHexagon.getRadiusLength() <= 0 || click.getX() - dlgHexagon.getRadiusLength() < 0)
+			if (dlgHexagon.getRadiusLength() + click.getX() > frame.getView().getWidth() || dlgHexagon.getRadiusLength() + click.getY() > frame.getView().getHeight() || click.getY() - dlgHexagon.getRadiusLength() <= 0 || click.getX() - dlgHexagon.getRadiusLength() < 0) {
 				JOptionPane.showMessageDialog(null, "The hexagon goes out of drawing!");
-			else {
+				dlgHexagon.write(click.getX(), click.getY());
+				dlgHexagon.setVisible(true);
+			} else {
 				Hexagon hexagon = new Hexagon(click.getX(), click.getY(), dlgHexagon.getRadiusLength());
 				hexagon.setBorderColor(edgeColor);
 				hexagon.setAreaColor(interiorColor);
@@ -283,7 +298,13 @@ public class DrawingController {
 		DlgPoint point = new DlgPoint();
 		point.write((Point) shape);
 		point.setVisible(true);
-		if(point.isConfirmed()) executeCommand(new CmdUpdatePoint((Point) shape, new Point(point.getXcoordinate(), point.getYcoordinate(), point.getColor()), log));
+		if(point.isConfirmed()) {
+			if (point.getXcoordinate() > frame.getWidth() || point.getYcoordinate() > frame.getHeight()) {
+				JOptionPane.showMessageDialog(null, "The point goes out of drawing!");
+				point.write((Point) shape);
+				point.setVisible(true);
+			} else executeCommand(new CmdUpdatePoint((Point) shape, new Point(point.getXcoordinate(), point.getYcoordinate(), point.getColor()), log));
+		}
 	}
 	
 	public void btnUpdateLineClicked(Shape shape) {
@@ -298,7 +319,11 @@ public class DrawingController {
 		rectangle.fillUp((Rectangle) shape);
 		rectangle.setVisible(true);
 		if(rectangle.isConfirmed()) {
-			if (rectangle.getWidth() + rectangle.getX() > frame.getView().getWidth() || rectangle.getHeight() + rectangle.getY() > frame.getView().getHeight() || rectangle.getY() - rectangle.getHeight() <= 0 || rectangle.getX() - rectangle.getWidth() < 0) JOptionPane.showMessageDialog(null, "The rectangle goes out of drawing!");
+			if (rectangle.getWidth() + rectangle.getX() > frame.getView().getWidth() || rectangle.getHeight() + rectangle.getY() > frame.getView().getHeight() || rectangle.getY() - rectangle.getHeight() <= 0 || rectangle.getX() - rectangle.getWidth() < 0) {
+				JOptionPane.showMessageDialog(null, "The rectangle goes out of drawing!");
+				rectangle.fillUp((Rectangle) shape);
+				rectangle.setVisible(true);
+			}
 			else executeCommand(new CmdUpdateRectangle((Rectangle) shape, new Rectangle(new Point(rectangle.getXcoordinate(), rectangle.getYcoordinate()), rectangle.getRectangleWidth(), rectangle.getRectangleHeight(), rectangle.getEdgeColor(), rectangle.getInteriorColor()), log));
 		}
 	}
@@ -308,7 +333,11 @@ public class DrawingController {
 		square.fillUp((Square) shape);
 		square.setVisible(true);
 		if(square.isConfirmed()) {
-			if (square.getWidth() + square.getX() > frame.getView().getWidth() || square.getWidth() + square.getY() > frame.getView().getHeight() || square.getY() - square.getWidth() <= 0 || square.getX() - square.getWidth() < 0) JOptionPane.showMessageDialog(null, "The square goes out of drawing!");
+			if (square.getWidth() + square.getX() > frame.getView().getWidth() || square.getWidth() + square.getY() > frame.getView().getHeight() || square.getY() - square.getWidth() <= 0 || square.getX() - square.getWidth() < 0) {
+				JOptionPane.showMessageDialog(null, "The square goes out of drawing!");
+				square.fillUp((Square) shape);
+				square.setVisible(true);
+			}
 			else executeCommand(new CmdUpdateSquare((Square) shape, new Square(new Point(square.getXcoordinate(), square.getYcoordinate()), square.getSideLength(), square.getEdgeColor(), square.getInteriorColor()), log));
 		}
 	}
@@ -318,8 +347,11 @@ public class DrawingController {
 		circle.fillUp((Circle) shape);
 		circle.setVisible(true);
 		if(circle.isConfirmed()) {
-			if (circle.getRadiusLength() + circle.getX() > frame.getView().getWidth() || circle.getRadiusLength() + circle.getY() > frame.getView().getHeight() || circle.getY() - circle.getRadiusLength() <= 0 || circle.getX() - circle.getRadiusLength() < 0) JOptionPane.showMessageDialog(null, "The circle goes out of drawing!");
-			else executeCommand(new CmdUpdateCircle((Circle) shape, new Circle(new Point(circle.getXcoordinateOfCenter(), circle.getYcoordinateOfCenter()), circle.getRadiusLength(), circle.getEdgeColor(), circle.getInteriorColor()), log));
+			if (circle.getRadiusLength() + circle.getX() > frame.getView().getWidth() || circle.getRadiusLength() + circle.getY() > frame.getView().getHeight() || circle.getY() - circle.getRadiusLength() <= 0 || circle.getX() - circle.getRadiusLength() < 0) {
+				JOptionPane.showMessageDialog(null, "The circle goes out of drawing!");
+				circle.fillUp((Circle) shape);
+				circle.setVisible(true);
+			} else executeCommand(new CmdUpdateCircle((Circle) shape, new Circle(new Point(circle.getXcoordinateOfCenter(), circle.getYcoordinateOfCenter()), circle.getRadiusLength(), circle.getEdgeColor(), circle.getInteriorColor()), log));
 		}
 	}
 	
@@ -328,7 +360,11 @@ public class DrawingController {
 		hexagon.fillUp((HexagonAdapter) shape);
 		hexagon.setVisible(true);
 		if (hexagon.isConfirmed()) {
-			if (hexagon.getRadiusLength() + hexagon.getX() > frame.getView().getWidth() || hexagon.getRadiusLength() + hexagon.getY() > frame.getView().getHeight() || hexagon.getY() - hexagon.getRadiusLength() <= 0 || hexagon.getX() - hexagon.getRadiusLength() < 0) JOptionPane.showMessageDialog(null, "The hexagon goes out of drawing!");
+			if (hexagon.getRadiusLength() + hexagon.getX() > frame.getView().getWidth() || hexagon.getRadiusLength() + hexagon.getY() > frame.getView().getHeight() || hexagon.getY() - hexagon.getRadiusLength() <= 0 || hexagon.getX() - hexagon.getRadiusLength() < 0) {
+				JOptionPane.showMessageDialog(null, "The hexagon goes out of drawing!");
+				hexagon.fillUp((HexagonAdapter) shape);
+				hexagon.setVisible(true);
+			}
 			else {
 				Hexagon hex = new Hexagon(hexagon.getXcoordinate(), hexagon.getYcoordinate(), hexagon.getRadiusLength());
 				hex.setAreaColor(hexagon.getInteriorColor());
@@ -387,8 +423,8 @@ public class DrawingController {
 	}
 	
 	public void undo() {
-		model.getCommands().peek().unexecute();
-		model.getUndoCommands().push(model.getCommands().pop());
+		model.getLastCommand().unexecute();
+		model.addUndoCommand(model.removeCommand());
 		if (frame.getList().isEmpty()) propertyChangeSupport.firePropertyChange("log turn off", false, true);
 		if (model.getUndoCommands().size() == 1) propertyChangeSupport.firePropertyChange("redo turn on", false, true);
 		if (model.getCommands().isEmpty()) propertyChangeSupport.firePropertyChange("undo turn off", false, true);
@@ -396,11 +432,14 @@ public class DrawingController {
 	}
 	
 	public void redo() {		
-		model.getUndoCommands().peek().execute();
-		model.getCommands().push(model.getUndoCommands().pop());
+		model.getLastUndoCommand().execute();
+		model.addCommand((model.removeUndoCommand()));
 		if (model.getUndoCommands().isEmpty()) propertyChangeSupport.firePropertyChange("redo turn off", false, true);
-		if (model.getCommands().size() == 1) propertyChangeSupport.firePropertyChange("shape exist", false, true);
-		if (!model.getCommands().isEmpty()) propertyChangeSupport.firePropertyChange("draw is not empty", false, true);
+		if (model.getCommands().size() == 1) {
+			propertyChangeSupport.firePropertyChange("shape exist", false, true);
+			propertyChangeSupport.firePropertyChange("draw is not empty", false, true);
+			propertyChangeSupport.firePropertyChange("log turn on", false, true);
+		}
 		frame.getView().repaint();
 	}
 	
@@ -421,7 +460,7 @@ public class DrawingController {
 		if (!model.getCommands().isEmpty()) chooser.setFileFilter(new FileNameExtensionFilter("Commands log", "log"));
 		if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
 			if (chooser.getFileFilter().getDescription().equals("Serialized draw")) fileManager = new FileManager(new FileDraw(model));
-			else if (chooser.getFileFilter().getDescription().equals("Commands log")) fileManager = new FileManager(new FileLog(frame));
+			else if (chooser.getFileFilter().getDescription().equals("Commands log")) fileManager = new FileManager(new FileLog(frame, model, this));
 			else fileManager = new FileManager(new FilePicture(frame));
 			fileManager.save(chooser.getSelectedFile());
 		}
@@ -442,15 +481,17 @@ public class DrawingController {
 				fileManager = new FileManager(new FileDraw(model));
 				frame.getView().repaint();
 			}
-			else if (chooser.getFileFilter().getDescription().equals("Commands log")) fileManager = new FileManager(new FileLog(frame));
+			else if (chooser.getFileFilter().getDescription().equals("Commands log")) fileManager = new FileManager(new FileLog(frame, model, this));
 			fileManager.open(chooser.getSelectedFile());
 		}	
 	}
 
 	public void newDraw() {
-		model.removeAll();
-		frame.getList().removeAllElements();
-		frame.getView().repaint();
+		if(JOptionPane.showConfirmDialog(null, "Are you sure that you want to start new draw?", "Warning!", JOptionPane.YES_NO_OPTION) == 0) {	
+			model.removeAll();
+			frame.getList().removeAllElements();
+			frame.getView().repaint();
+		}
 	}
 
 	public void toFront() {

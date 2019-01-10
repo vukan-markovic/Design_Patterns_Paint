@@ -98,7 +98,7 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 		buttonsPanel.setBackground(Color.CYAN);
 
 		view = new DrawingView();
-		view.setBackground(Color.YELLOW);
+		view.setBackground(Color.WHITE);
 		mainPanel.add(buttonsPanel, BorderLayout.NORTH);
 		mainPanel.add(buttonsPanelForDrawing, BorderLayout.SOUTH);
 		mainPanel.add(view, BorderLayout.CENTER);
@@ -216,7 +216,7 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 		buttonsPanel.add(btnDelete);
 
 		JButton btnEdgeColor = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/picker.png")));
-		btnEdgeColor.setForeground(new Color(0, 0, 204));
+		btnEdgeColor.setForeground(Color.WHITE);
 		btnEdgeColor.setText("Edge color");
 		btnEdgeColor.setBackground(Color.BLACK);
 		btnEdgeColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -224,6 +224,7 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 
 		JButton btnInteriorColor = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/color-picker.png")));
 		btnInteriorColor.setText("Area color");
+		btnInteriorColor.setForeground(Color.BLACK);
 		btnInteriorColor.setBackground(Color.WHITE);
 		btnInteriorColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		buttonsPanel.add(btnInteriorColor);
@@ -381,7 +382,11 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 			@Override
 			public void mouseClicked(MouseEvent click) {
 				color = controller.btnInteriorColorClicked();
-				if (color != null) btnInteriorColor.setBackground(color);
+				if (color != null) {
+					if (color.equals(Color.BLACK)) btnInteriorColor.setForeground(Color.WHITE);
+					else if (color.equals(Color.WHITE)) btnInteriorColor.setForeground(Color.BLACK);
+					btnInteriorColor.setBackground(color);
+				}
 			}
 		});
 		

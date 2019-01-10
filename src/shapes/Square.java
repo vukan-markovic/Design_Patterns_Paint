@@ -44,8 +44,17 @@ public class Square extends SurfaceShape implements Comparable<Square> {
      */
     @Override
     public String toString() {
-        return "Square: up left point: " + getUpLeft() + ", side = " + side + ", edge color = " + getColor().toString().substring(14) + ", area color = " + getInteriorColor().toString().substring(14);
+        return "Square: x=" + upLeft.getXcoordinate() + "; y=" + upLeft.getYcoordinate() + "; side=" + side + "; edge color=" + getColor().toString().substring(14).replace('=', '-') + "; area color=" + getInteriorColor().toString().substring(14).replace('=', '-');
     }
+    
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Square) {
+			Square castedObj = (Square) obj;
+			return upLeft.equals(castedObj.upLeft) && side == castedObj.side;
+		}
+		return false;
+	}
 
     /**
      * @return
