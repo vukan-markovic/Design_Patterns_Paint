@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * Abstract class which all shapes extend. Allows that other elements of application are not depend on all shapes individually but on this class.
  */
-public abstract class Shape implements Movable, Cloneable, Serializable {
+public abstract class Shape implements Movable, Cloneable, Serializable, Comparable<Shape> {
 	private static final long serialVersionUID = 1L;
 	private boolean selected;
     private Color color = Color.BLACK;

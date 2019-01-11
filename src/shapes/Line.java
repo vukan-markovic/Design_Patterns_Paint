@@ -35,7 +35,7 @@ public class Line extends Shape {
     }
     
     /**
-     * Compare two lines depend on initial and last point.
+     * Determine if two lines are equal depend on initial and last point.
      */
 	@Override
 	public boolean equals(Object obj) {
@@ -44,6 +44,15 @@ public class Line extends Shape {
 			return initial.equals(castedObj.initial) && last.equals(castedObj.last);
 		}
 		return false;
+	}
+	
+    /**
+     * Compare two lines depend by length.
+     */
+	@Override
+	public int compareTo(Shape shape) {
+		if (shape instanceof Line) return (int) distance() - (int) ((Line) shape).distance();
+		return 0;
 	}
 	
 	/**

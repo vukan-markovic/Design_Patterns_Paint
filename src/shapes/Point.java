@@ -48,6 +48,15 @@ public class Point extends Shape {
 	}
     
     /**
+     * Compare two points depend on their distance.
+     */
+	@Override
+	public int compareTo(Shape newPoint) {
+		Point coordinateStart = new Point(0, 0);
+		return (int) (distance(coordinateStart) - ((Point) newPoint).distance(coordinateStart));
+	}
+    
+    /**
      * Print point values.
      * 
      * @return

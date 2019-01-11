@@ -46,6 +46,15 @@ public class Square extends SurfaceShape {
 		}
 		return false;
 	}
+    
+    /**
+     * Compares two squares depend on their surface.
+     */
+    @Override
+	public int compareTo(Shape o) {
+		if (o instanceof Square) return surface() - ((Square) o).surface();
+		return 0;
+	}
 
     /**
      * Print square values.
@@ -112,7 +121,7 @@ public class Square extends SurfaceShape {
      * 
      * @return surface of square.
      */
-    public double surface() {
+    public int surface() {
         return side * side;
     }
 
