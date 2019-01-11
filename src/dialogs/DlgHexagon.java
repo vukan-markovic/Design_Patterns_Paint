@@ -153,6 +153,7 @@ public class DlgHexagon extends JDialog {
 
         btnEdgeColor = new JButton("Choose edge color");
         btnEdgeColor.setFont(new Font("Arial", Font.BOLD, 12));
+        btnEdgeColor.setForeground(Color.WHITE);
         btnEdgeColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnEdgeColor.addMouseListener(new MouseAdapter() {
 			@Override

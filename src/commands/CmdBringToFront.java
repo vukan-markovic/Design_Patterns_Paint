@@ -12,12 +12,14 @@ public class CmdBringToFront implements Command {
 	private Shape shape;
 	private DefaultListModel<String> log;
 	private int index;
+	private int size;
 	private String command;
 	
-	public CmdBringToFront(DrawingModel model, Shape shape, DefaultListModel<String> log) {
+	public CmdBringToFront(DrawingModel model, Shape shape, DefaultListModel<String> log, int size) {
 		this.model = model;
 		this.shape = shape;
 		this.log = log;
+		this.size = size;
 	}
 
 	/**
@@ -27,7 +29,7 @@ public class CmdBringToFront implements Command {
 	public void execute() {
 		index =  model.getIndexOfShape(shape);
 		model.removeShapeAtIndex(index);
-		model.addShapeToIndex(model.getAll().size() - 1, shape);
+		model.addShapeToIndex(size, shape);
 		command = "Bringed to front->" + shape.toString();
 		log.addElement(command);
 	}

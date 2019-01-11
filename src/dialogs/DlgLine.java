@@ -29,9 +29,6 @@ public class DlgLine extends JDialog {
 	private int yCoordinateInitial;
 	private int xCoordinateLast;
 	private int yCoordinateLast;
-	private int drawWidth;
-	private int drawHeight;
-	private Line line;
 
 	public static void main(String[] arrayOfStrings) {
 		try {
@@ -186,7 +183,6 @@ public class DlgLine extends JDialog {
 								xCoordinateLast = Integer.parseInt(txtxCoordinateLast.getText());
 								yCoordinateLast = Integer.parseInt(txtyCoordinateLast.getText());
 								if (xCoordinateInitial <= 0 || yCoordinateInitial <= 0 || xCoordinateLast <= 0 || yCoordinateLast <= 0) JOptionPane.showMessageDialog(null, "X and Y coordinates of initial and last point of line must be positive numbers!");
-								else if(line.getInitial().getXcoordinate() - line.distance() <= 0) JOptionPane.showMessageDialog(null, "The circle goes out of drawing!");
 								else {
 									confirmed = true;
 									setVisible(false);
@@ -221,16 +217,13 @@ public class DlgLine extends JDialog {
 	/** 
      * {@inheritDoc DlgCircle#write(int, int, int, int)}
 	 */
-	public void write(Line line, int drawWidth, int drawHeight) {
-		this.line = line;
+	public void write(Line line) {
 		txtxCoordinateInitial.setText(String.valueOf(line.getInitial().getXcoordinate()));
 		txtyCoordinateInitial.setText(String.valueOf(line.getInitial().getYcoordinate()));
 		txtxCoordinateLast.setText(String.valueOf(line.getLast().getXcoordinate()));
 		txtyCoordinateLast.setText(String.valueOf(line.getLast().getYcoordinate()));
 		lineColor = line.getColor();
 		btnColor.setBackground(lineColor);
-		this.drawWidth = drawWidth;
-		this.drawHeight = drawHeight;
 	}
 
 	/**

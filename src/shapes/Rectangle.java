@@ -39,8 +39,7 @@ public class Rectangle extends Square {
 	public boolean equals(Object obj) {
 		if (obj instanceof Rectangle) {
 			Rectangle castedObj = (Rectangle) obj;
-			return upLeft.equals(castedObj.upLeft) && width == castedObj.getWidth()
-					&& side == castedObj.side;
+			return upLeft.equals(castedObj.upLeft) && width == castedObj.getWidth() && side == castedObj.side;
 		}
 		return false;
 	}

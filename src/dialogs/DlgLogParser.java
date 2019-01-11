@@ -55,8 +55,7 @@ public class DlgLogParser extends JDialog {
 			activityLog = new JList<String>();
 			log = new DefaultListModel<>();
 			activityLog.setModel(log);
-			activityLog.setFixedCellHeight(400);
-			activityLog.setFixedCellWidth(600);
+			activityLog.setVisibleRowCount(20);
 			activityLog.setEnabled(false);
 			activityLog.setBackground(Color.ORANGE);
 			activityLog.setFont(new Font("Lucida Console", Font.BOLD, 12));

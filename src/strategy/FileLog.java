@@ -93,48 +93,46 @@ public class FileLog implements FileHandler {
 	 * @param command Represent command that need to be parsed.
 	 */
 	public void readLine(String command) {
-		String[] commands1 = command.split("->");
-		switch(commands1[0]) {
-		case "Added":
-			controller.executeCommand(new CmdAddShape(parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), model, frame.getList())); 
-			break;
-		case "Updated":
-			Shape shape1 = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
-			int index = model.getIndexOfShape(shape1);
-			if (shape1 instanceof Point) controller.executeCommand(new CmdUpdatePoint((Point) model.getShapeByIndex(index), parsePoint(commands1[2].split(":")[1]), frame.getList()));
-			else if (shape1 instanceof Line) controller.executeCommand(new CmdUpdateLine((Line) model.getShapeByIndex(index), parseLine(commands1[2].split(":")[1]), frame.getList()));
-			else if (shape1 instanceof Square) controller.executeCommand(new CmdUpdateSquare((Square) model.getShapeByIndex(index), parseSquare(commands1[2].split(":")[1]), frame.getList()));
-			else if (shape1 instanceof Rectangle) controller.executeCommand(new CmdUpdateRectangle((Rectangle) model.getShapeByIndex(index), parseRectangle(commands1[2].split(":")[1]), frame.getList()));
-			else if (shape1 instanceof Circle) controller.executeCommand(new CmdUpdateCircle((Circle) model.getShapeByIndex(index), parseCircle(commands1[2].split(":")[1]), frame.getList()));
-			else controller.executeCommand(new CmdUpdateHexagon((HexagonAdapter) model.getShapeByIndex(index), parseHexagon(commands1[2].split(":")[1]), frame.getList()));
-			break;
-		case "Deleted":
-			controller.executeCommand(new CmdRemoveShape(parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), model, frame.getList())); 
-			break;
-		case "Moved to front":
-			controller.executeCommand(new CmdToFront(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log));
-			break;
-		case "Moved to back":
-			controller.executeCommand(new CmdToBack(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log));
-			break;
-		case "Bringed to front":
-			controller.executeCommand(new CmdBringToFront(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log));
-			break;
-		case "Bringed to back":
-			controller.executeCommand(new CmdBringToBack(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log));
-			break;
-		}
-		
 		try {
+			String[] commands1 = command.split("->");
+			switch(commands1[0]) {
+			case "Added":
+				controller.executeCommand(new CmdAddShape(parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), model, frame.getList())); 
+				break;
+			case "Updated":
+				Shape shape1 = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
+				int index = model.getIndexOfShape(shape1);
+				if (shape1 instanceof Point) controller.executeCommand(new CmdUpdatePoint((Point) model.getShapeByIndex(index), parsePoint(commands1[2].split(":")[1]), frame.getList()));
+				else if (shape1 instanceof Line) controller.executeCommand(new CmdUpdateLine((Line) model.getShapeByIndex(index), parseLine(commands1[2].split(":")[1]), frame.getList()));
+				else if (shape1 instanceof Rectangle) controller.executeCommand(new CmdUpdateRectangle((Rectangle) model.getShapeByIndex(index), parseRectangle(commands1[2].split(":")[1]), frame.getList()));
+				else if (shape1 instanceof Square) controller.executeCommand(new CmdUpdateSquare((Square) model.getShapeByIndex(index), parseSquare(commands1[2].split(":")[1]), frame.getList()));
+				else if (shape1 instanceof Circle) controller.executeCommand(new CmdUpdateCircle((Circle) model.getShapeByIndex(index), parseCircle(commands1[2].split(":")[1]), frame.getList()));
+				else if (shape1 instanceof HexagonAdapter) controller.executeCommand(new CmdUpdateHexagon((HexagonAdapter) model.getShapeByIndex(index), parseHexagon(commands1[2].split(":")[1]), frame.getList()));
+				break;
+			case "Deleted":
+				controller.executeCommand(new CmdRemoveShape(parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), model, frame.getList())); 
+				break;
+			case "Moved to front":
+				controller.executeCommand(new CmdToFront(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log));
+				break;
+			case "Moved to back":
+				controller.executeCommand(new CmdToBack(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log));
+				break;
+			case "Bringed to front":
+				controller.executeCommand(new CmdBringToFront(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log, model.getAll().size() - 1));
+				break;
+			case "Bringed to back":
+				controller.executeCommand(new CmdBringToBack(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log));
+				break;
+			}
+		
 			String line = reader.readLine();
 			if (line != null) logParser.addCommand(line);
 			else {
 				logParser.closeDialog();
 				return;
 			}
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+		} catch (Exception e) {}
 	}
 	
 	/**
@@ -199,9 +197,7 @@ public class FileLog implements FileHandler {
 		String [] edgeColors = s.split(",");
 		String s1 = squareParts[4].split("=")[1].substring(1, squareParts[4].split("=")[1].length() - 1);
 		String [] interiorColors = s1.split(",");
-		Square sq = new Square(new Point(x, y), side, new Color(Integer.parseInt(edgeColors[0].split("-")[1]), Integer.parseInt(edgeColors[1].split("-")[1]), Integer.parseInt(edgeColors[2].split("-")[1])), new Color(Integer.parseInt(interiorColors[0].split("-")[1]), Integer.parseInt(interiorColors[1].split("-")[1]), Integer.parseInt(interiorColors[2].split("-")[1])));
-		System.out.println(sq);
-		return sq;
+		return new Square(new Point(x, y), side, new Color(Integer.parseInt(edgeColors[0].split("-")[1]), Integer.parseInt(edgeColors[1].split("-")[1]), Integer.parseInt(edgeColors[2].split("-")[1])), new Color(Integer.parseInt(interiorColors[0].split("-")[1]), Integer.parseInt(interiorColors[1].split("-")[1]), Integer.parseInt(interiorColors[2].split("-")[1])));
 	}
 
 	/**

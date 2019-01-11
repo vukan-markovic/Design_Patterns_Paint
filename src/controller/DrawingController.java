@@ -310,7 +310,7 @@ public class DrawingController {
 	 */
 	public void btnUpdateLineClicked(Line line) {
 		DlgLine dlgLine = new DlgLine();
-		dlgLine.write(line, frame.getView().getWidth(), frame.getView().getHeight());
+		dlgLine.write(line);
 		dlgLine.setVisible(true);
 		if(dlgLine.isConfirmed()) executeCommand(new CmdUpdateLine(line, new Line(new Point(dlgLine.getXcoordinateInitial(), dlgLine.getYcoordinateInitial()), new Point(dlgLine.getXcoordinateLast(), dlgLine.getYcoordinateLast()), dlgLine.getColor()), log));
 	}
@@ -526,6 +526,7 @@ public class DrawingController {
 			}
 			else if (chooser.getFileFilter().getDescription().equals("Commands log")) fileManager = new FileManager(new FileLog(frame, model, this));
 			fileManager.open(chooser.getSelectedFile());
+			propertyChangeSupport.firePropertyChange("draw is loaded", false, true);
 		}	
 		chooser.setVisible(false);
 	}
@@ -557,7 +558,7 @@ public class DrawingController {
 	public void bringToFront() {
 		Shape shape = getSelectedShape();
 		if (model.getIndexOfShape(shape) == model.getAll().size() - 1) JOptionPane.showMessageDialog(null, "Shape is already on top!");
-		else executeCommand(new CmdBringToFront(model, shape, log));
+		else executeCommand(new CmdBringToFront(model, shape, log, model.getAll().size() - 1));
 	}
 
 	/**
