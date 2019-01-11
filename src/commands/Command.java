@@ -1,13 +1,13 @@
 package commands;
 
 /**
+ * <h3>Represent inferface for all commands in the application.</h3>
  * 
- * @author Vukan Marković
- * 
- * Represent inferface for all commands in the application. 
- * Define two methods: 
- * {@link #execute()} - Execute some command.
- * {@link #unexecute()} - Undo some command.
+ * Define two methods:
+ * <ul> 
+ * <li>{@link #execute()} - Execute some command.</li>
+ * <li>{@link #unexecute()} - Undo some command.</li>
+ * <ul>
  */
 public interface Command {
 	void execute();

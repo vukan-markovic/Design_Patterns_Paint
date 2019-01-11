@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import model.DrawingModel;
 import shapes.Shape;
 
+/**
+ * 
+ */
 public class FileDraw implements FileHandler {
 	private FileOutputStream fileOutputStream;
 	private FileInputStream fileInputStream;
@@ -18,6 +21,9 @@ public class FileDraw implements FileHandler {
 		this.model = model;
 	}
 	
+	/**
+	 * Save forwarded file as serializable.
+	 */
 	@Override
 	public void save(File file) {
 			try {
@@ -27,21 +33,24 @@ public class FileDraw implements FileHandler {
 				out.close();
 				fileOutputStream.close();
 			} catch (Exception e) {
-				e.printStackTrace();
+				System.out.println(e.getMessage());
 			}
 	}
 
+	/**
+	 * Open serializable file and load it to draw adding shapes to model.
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void open(File file) {
 		try {
 			fileInputStream = new FileInputStream(file);
-			 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-	         model.addMultiple((ArrayList<Shape>) objectInputStream.readObject());
-	         objectInputStream.close();
-	         fileInputStream.close();
+			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+	        model.addMultiple((ArrayList<Shape>) objectInputStream.readObject());
+	        objectInputStream.close();
+	        fileInputStream.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 }

@@ -3,15 +3,12 @@ package commands;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.swing.DefaultListModel;
 import model.DrawingModel;
 import shapes.Point;
 import shapes.Shape;
 
 /**
- * @author Vukan Marković
- *
  * Class that represent command for remove existing shape from the draw. 
  */
 public class CmdRemoveShape implements Command {

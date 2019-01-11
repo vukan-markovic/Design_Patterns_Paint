@@ -4,23 +4,23 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
-
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
 import strategy.FileLog;
-
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
 
-public class LogParser extends JDialog {
+/**
+ * Class represent {@link JDialog} for parsing log command in interaction with user.
+ */
+public class DlgLogParser extends JDialog {
 	private static final long serialVersionUID = 1L;
-	private final JPanel contentPanel = new JPanel();
+	private final JPanel contentPanel;
 	private JScrollPane scrollPane;
 	private JList<String> activityLog;
 	private DefaultListModel<String> log;
@@ -28,7 +28,7 @@ public class LogParser extends JDialog {
 	
 	public static void main(String[] args) {
 		try {
-			LogParser dialog = new LogParser();
+			DlgLogParser dialog = new DlgLogParser();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
@@ -36,9 +36,14 @@ public class LogParser extends JDialog {
 		}
 	}
 
-	public LogParser() {
-		setBounds(100, 100, 450, 300);
+	public DlgLogParser() {
+		setBounds(100, 100, 600, 400);
+		setModal(true);
+		setResizable(false);
+		setLocationRelativeTo(null);
+		setTitle("Log commands parser");
 		getContentPane().setLayout(new BorderLayout());
+		contentPanel = new JPanel();
 		contentPanel.setLayout(new FlowLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -50,7 +55,8 @@ public class LogParser extends JDialog {
 			activityLog = new JList<String>();
 			log = new DefaultListModel<>();
 			activityLog.setModel(log);
-			activityLog.setVisibleRowCount(14);
+			activityLog.setFixedCellHeight(400);
+			activityLog.setFixedCellWidth(600);
 			activityLog.setEnabled(false);
 			activityLog.setBackground(Color.ORANGE);
 			activityLog.setFont(new Font("Lucida Console", Font.BOLD, 12));
@@ -64,8 +70,8 @@ public class LogParser extends JDialog {
 				JButton okButton = new JButton("Execute");
 				okButton.addMouseListener(new MouseAdapter() {
 					@Override
-					public void mouseClicked(MouseEvent e) {
-						fileLog.readLine(log.getElementAt(log.size() - 1));
+					public void mouseClicked(MouseEvent click) {
+						if (fileLog != null) fileLog.readLine(log.getElementAt(log.size() - 1));
 					}
 				});
 				okButton.setActionCommand("OK");
@@ -76,7 +82,7 @@ public class LogParser extends JDialog {
 				JButton cancelButton = new JButton("Cancel");
 				cancelButton.addMouseListener(new MouseAdapter() {
 					@Override
-					public void mouseClicked(MouseEvent e) {
+					public void mouseClicked(MouseEvent click) {
 						setVisible(false);
 						dispose();
 					}
@@ -88,6 +94,10 @@ public class LogParser extends JDialog {
 		
 	}
 	
+	/**
+	 * <h3>Add command to list that is last executed.</h3>
+	 * @param command
+	 */
 	public void addCommand(String command) {
 		log.addElement(command);
 	}
@@ -96,6 +106,9 @@ public class LogParser extends JDialog {
 		this.fileLog = fileLog;
 	}
 
+	/**
+	 * <h3>Method that closes this dialog.</h3> 
+	 */
 	public void closeDialog() {
 		dispose();
 	}

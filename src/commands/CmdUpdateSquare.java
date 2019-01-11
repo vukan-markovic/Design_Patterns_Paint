@@ -1,12 +1,9 @@
 package commands;
 
 import javax.swing.DefaultListModel;
-
 import shapes.Square;
 
 /**
- * @author Vukan Marković
- *
  * Class that represent command for update existing square from the draw.
  */
 public class CmdUpdateSquare implements Command {
@@ -29,7 +26,7 @@ public class CmdUpdateSquare implements Command {
 	 */
 	@Override
 	public void execute() {
-		oldState.setUpLeft(newState.getUpLeft());
+		oldState.setUpLeft(newState.getUpLeft().clone());
 		oldState.setSide(newState.getSide());
 		oldState.setColor(newState.getColor());
 		oldState.setInteriorColor(newState.getInteriorColor());

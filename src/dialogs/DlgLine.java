@@ -3,17 +3,14 @@ package dialogs;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-
 import shapes.Line;
 
 import java.awt.event.*;
 
 /**
- * 
- * @author Vukan Markovic
+ * Class represent {@link JDialog} for adding or updating {@link Line}.
  */
 public class DlgLine extends JDialog {
-
 	private static final long serialVersionUID = 1L;
 	private final JPanel mainPanel;
 	private JTextField txtxCoordinateInitial;
@@ -32,11 +29,10 @@ public class DlgLine extends JDialog {
 	private int yCoordinateInitial;
 	private int xCoordinateLast;
 	private int yCoordinateLast;
+	private int drawWidth;
+	private int drawHeight;
+	private Line line;
 
-	/**
-	 * 
-	 * @param arrayOfStrings
-	 */
 	public static void main(String[] arrayOfStrings) {
 		try {
 			DlgLine dialog = new DlgLine();
@@ -47,9 +43,6 @@ public class DlgLine extends JDialog {
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public DlgLine() {
 		setModal(true);
 		setResizable(false);
@@ -155,11 +148,19 @@ public class DlgLine extends JDialog {
 		
 		btnColor = new JButton("Choose color");
 		btnColor.setFont(new Font("Arial", Font.BOLD, 12));
+		btnColor.setForeground(Color.WHITE);
 		btnColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		
-		btnColor.addActionListener(new ActionListener() {		
-			public void actionPerformed(ActionEvent click) {
+		btnColor.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
 				color = JColorChooser.showDialog(null, "Colors pallete", lineColor);
+				if (color != null) {
+					if (color.equals(Color.WHITE)) JOptionPane.showMessageDialog(null, "Background is white :D");
+					else {
+						lineColor = color;
+						btnColor.setBackground(lineColor);
+					}
+				}
 			}
 		});
 	
@@ -175,26 +176,24 @@ public class DlgLine extends JDialog {
 			{
 				JButton btnConfirm = new JButton("Confirm");
 				btnConfirm.setBackground(Color.GREEN);
-				btnConfirm.addMouseListener(new MouseAdapter() {
-                	@Override
-        			public void mouseClicked(MouseEvent click) {
-						if (txtxCoordinateInitial.getText().isEmpty() || txtyCoordinateInitial.getText().isEmpty()  || txtxCoordinateLast.getText().isEmpty() || txtyCoordinateLast.getText().isEmpty())
-							JOptionPane.showMessageDialog(getParent(), "Values cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+				btnConfirm.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent click) {
+						if (txtxCoordinateInitial.getText().isEmpty() || txtyCoordinateInitial.getText().isEmpty()  || txtxCoordinateLast.getText().isEmpty() || txtyCoordinateLast.getText().isEmpty()) JOptionPane.showMessageDialog(getParent(), "Values cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
 						else {
 							try {	
-								confirmed = true;
 								xCoordinateInitial = Integer.parseInt(txtxCoordinateInitial.getText());
 								yCoordinateInitial = Integer.parseInt(txtyCoordinateInitial.getText());
 								xCoordinateLast = Integer.parseInt(txtxCoordinateLast.getText());
 								yCoordinateLast = Integer.parseInt(txtyCoordinateLast.getText());
-								setVisible(false);
-								dispose();
+								if (xCoordinateInitial <= 0 || yCoordinateInitial <= 0 || xCoordinateLast <= 0 || yCoordinateLast <= 0) JOptionPane.showMessageDialog(null, "X and Y coordinates of initial and last point of line must be positive numbers!");
+								else if(line.getInitial().getXcoordinate() - line.distance() <= 0) JOptionPane.showMessageDialog(null, "The circle goes out of drawing!");
+								else {
+									confirmed = true;
+									setVisible(false);
+									dispose();
+								}
 							} catch (NumberFormatException nfe) {
-								JOptionPane.showMessageDialog(getParent(),"Coordinates of initial and last point must be whole numbers!", "Error", JOptionPane.ERROR_MESSAGE);
-								txtxCoordinateInitial.setText("");
-								txtyCoordinateInitial.setText("");
-								txtxCoordinateLast.setText("");
-								txtyCoordinateLast.setText("");
+								JOptionPane.showMessageDialog(getParent(),"X and Y coordinates of initial and last point of line must be whole numbers!", "Error", JOptionPane.ERROR_MESSAGE);
 							} 
 						}  
 					}
@@ -219,64 +218,44 @@ public class DlgLine extends JDialog {
 		}
 	}
 
-	/**
-	 * 
-	 * @param line
+	/** 
+     * {@inheritDoc DlgCircle#write(int, int, int, int)}
 	 */
-	public void write(Line line) {
+	public void write(Line line, int drawWidth, int drawHeight) {
+		this.line = line;
 		txtxCoordinateInitial.setText(String.valueOf(line.getInitial().getXcoordinate()));
 		txtyCoordinateInitial.setText(String.valueOf(line.getInitial().getYcoordinate()));
 		txtxCoordinateLast.setText(String.valueOf(line.getLast().getXcoordinate()));
 		txtyCoordinateLast.setText(String.valueOf(line.getLast().getYcoordinate()));
 		lineColor = line.getColor();
+		btnColor.setBackground(lineColor);
+		this.drawWidth = drawWidth;
+		this.drawHeight = drawHeight;
 	}
 
 	/**
-	 * 
-	 * @return
-	 */
+     * {@inheritDoc DlgSquare#isConfirmed()}
+     */
+	public boolean isConfirmed() {
+		return confirmed;
+	}
+	
 	public Color getColor() {
-		if (color == null) return lineColor;
-		else return color;
+		return lineColor;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	public int getXcoordinateInitial() {
 		return xCoordinateInitial;
 	}
-
-	/**
-	 * 
-	 * @return
-	 */
 	public int getYcoordinateInitial() {
 		return yCoordinateInitial;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	public int getXcoordinateLast() {
 		return xCoordinateLast;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	public int getYcoordinateLast() {
 		return yCoordinateLast;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isConfirmed() {
-		return confirmed;
 	}
 }

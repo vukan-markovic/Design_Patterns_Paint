@@ -1,7 +1,6 @@
 package commands;
 
 import javax.swing.DefaultListModel;
-
 import shapes.Rectangle;
 
 /**
@@ -29,7 +28,7 @@ public class CmdUpdateRectangle implements Command {
 	 */
 	@Override
 	public void execute() {
-		oldState.setUpLeft(newState.getUpLeft());
+		oldState.setUpLeft(newState.getUpLeft().clone());
 		oldState.setWidth(newState.getWidth());
 		oldState.setSide(newState.getSide());
 		oldState.setColor(newState.getColor());

@@ -3,17 +3,14 @@ package dialogs;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-
 import shapes.Square;
 
 import java.awt.event.*;
 
 /**
- * 
- * @author Vukan Markovic
+ * Class represent {@link JDialog} for adding or updating {@link Square}.
  */
 public class DlgSquare extends JDialog {
-
 	private static final long serialVersionUID = 1L;
 	private final JPanel mainPanel;
 	private JTextField txtXcoordinate;
@@ -25,13 +22,15 @@ public class DlgSquare extends JDialog {
 	private int xCoordinate;
 	private int yCoordinate;
 	private int sideLength;
-	private Color edgeColorOfSquare = Color.BLACK;
-	private Color interiorColorOfSquare = Color.WHITE;
-	private Color edgeColor = Color.BLACK;
-	private Color interiorColor = Color.WHITE;
+	private Color edgeColorOfSquare;
+	private Color interiorColorOfSquare;
+	private Color edgeColor;
+	private Color interiorColor;
 	private boolean confirmed;
 	private JButton btnEdgeColor;
 	private JButton btnInteriorColor;
+	private int drawWidth;
+	private int drawHeight;
 
 	public static void main(String [] arrayOfStrings) {
 		try {
@@ -125,10 +124,19 @@ public class DlgSquare extends JDialog {
 		gbc_btnEdgeColor.gridy = 9;
 
 		btnEdgeColor = new JButton("Choose edge color");
+		btnEdgeColor.setForeground(Color.WHITE);
 		btnEdgeColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		btnEdgeColor.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent click) {
+		btnEdgeColor.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
 				edgeColor = JColorChooser.showDialog(null, "Colors pallete", edgeColorOfSquare);
+				if (edgeColor != null) {
+					if (edgeColor.equals(Color.WHITE)) JOptionPane.showMessageDialog(null, "Background is white :D");
+					else {
+						edgeColorOfSquare = edgeColor;
+						btnEdgeColor.setBackground(edgeColorOfSquare);
+					}
+				}
 			}
 		});
 
@@ -140,10 +148,18 @@ public class DlgSquare extends JDialog {
 		gbc_btnInteriorColor.gridy = 9;
 
 		btnInteriorColor = new JButton("Choose interior color");
+		btnInteriorColor.setForeground(Color.BLACK);
 		btnInteriorColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		btnInteriorColor.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent click) {
+		btnInteriorColor.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
 				interiorColor = JColorChooser.showDialog(null, "Colors pallete", interiorColorOfSquare);
+				if (interiorColor != null) {
+					interiorColorOfSquare = interiorColor;
+					if (interiorColorOfSquare.equals(Color.BLACK)) btnInteriorColor.setForeground(Color.WHITE);
+					else if (interiorColorOfSquare.equals(Color.WHITE)) btnInteriorColor.setForeground(Color.BLACK);
+					btnInteriorColor.setBackground(interiorColorOfSquare);
+				}
 			}
 		});
 
@@ -156,26 +172,23 @@ public class DlgSquare extends JDialog {
 				JButton btnConfirm = new JButton("Confirm");
 				btnConfirm.setBackground(Color.GREEN);
 				btnConfirm.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				btnConfirm.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mouseClicked(MouseEvent click) {
-						if (txtXcoordinate.getText().isEmpty() || txtYcoordinate.getText().isEmpty() || txtSideLength.getText().isEmpty())
-							JOptionPane.showMessageDialog(getParent(), "Values cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+				btnConfirm.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent click) {
+						if (txtXcoordinate.getText().isEmpty() || txtYcoordinate.getText().isEmpty() || txtSideLength.getText().isEmpty()) JOptionPane.showMessageDialog(getParent(), "Values cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
 						else {
 							try {	
-								if(Integer.parseInt(txtSideLength.getText()) <= 0) {
-									JOptionPane.showMessageDialog(getParent(), "Length of side must be greater than zero.", "Error", JOptionPane.ERROR_MESSAGE);
-									txtSideLength.setText("");
-								} else {
+								xCoordinate = Integer.parseInt(txtXcoordinate.getText());
+								yCoordinate = Integer.parseInt(txtYcoordinate.getText());
+								sideLength = Integer.parseInt(txtSideLength.getText());
+								if(xCoordinate <= 0 || yCoordinate <= 0 || sideLength <= 0) JOptionPane.showMessageDialog(getParent(), "X and Y coordinates of up left point and side length of square must be positive numbers!", "Error", JOptionPane.ERROR_MESSAGE);
+								else if (sideLength + xCoordinate > drawWidth || sideLength + yCoordinate > drawHeight) JOptionPane.showMessageDialog(null, "The square goes out of drawing!");
+								else {
 									confirmed = true;
-									xCoordinate = Integer.parseInt(txtXcoordinate.getText());
-									yCoordinate = Integer.parseInt(txtYcoordinate.getText());
-									sideLength = Integer.parseInt(txtSideLength.getText());
 									setVisible(false);
 									dispose();
 								}
 							} catch (NumberFormatException exception) {
-								JOptionPane.showMessageDialog(getParent(),"Coordinate of point and side length must be whole numbers!", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(getParent(),"X and Y coordinates of up left point and side length of square must be whole numbers!", "Error", JOptionPane.ERROR_MESSAGE);
 							} 
 						}  
 					}
@@ -201,32 +214,39 @@ public class DlgSquare extends JDialog {
 		}
 	}
 
-	/**
-	 * 
-	 * @param xClick
-	 * @param yClick
+	/** 
+     * {@inheritDoc DlgCircle#write(int, int, int, int)}
 	 */
-	public void write(int xClick, int yClick) {
+	public void write(int xClick, int yClick, int drawWidth, int drawHeight) {
 		txtXcoordinate.setText(String.valueOf(xClick));
 		txtXcoordinate.setEnabled(false);
 		txtYcoordinate.setText(String.valueOf(yClick));
 		txtYcoordinate.setEnabled(false);
+		this.drawWidth = drawWidth;
+		this.drawHeight = drawHeight;
 	}
 
 	/**
+	 * <h3>Fill up fields with parameters of {@link Square} that user want to update.</h3>
 	 * 
-	 * @param square
+	 * @param square Represent {@link Square} that user want to update.
 	 */
-	public void fillUp(Square square) {
+	public void fillUp(Square square, int drawWidth, int drawHeight) {
 		txtXcoordinate.setText(String.valueOf(square.getUpLeft().getXcoordinate()));
 		txtYcoordinate.setText(String.valueOf(square.getUpLeft().getYcoordinate()));
 		txtSideLength.setText(String.valueOf(square.getSide()));
 		edgeColorOfSquare = square.getColor();
 		interiorColorOfSquare = square.getInteriorColor();
+		if (interiorColorOfSquare.equals(Color.BLACK)) btnInteriorColor.setForeground(Color.WHITE);
+		else if (interiorColorOfSquare.equals(Color.WHITE)) btnInteriorColor.setForeground(Color.BLACK);
+		btnEdgeColor.setBackground(edgeColorOfSquare);
+		btnInteriorColor.setBackground(interiorColorOfSquare);
+		this.drawWidth = drawWidth;
+		this.drawHeight = drawHeight;
 	}
 
-	/**
-	 * 
+	/** 
+	 * <h3>Hide buttons for colors when new operation is adding.</h3>
 	 */
 	public void deleteButtons() {
 		btnEdgeColor.setVisible(false);
@@ -234,52 +254,31 @@ public class DlgSquare extends JDialog {
 	}
 
 	/**
+	 * Method that determine if user confirm dialog.
 	 * 
-	 * @return
+	 * @return Boolean that indicate if user confirm dialog.
 	 */
+	public boolean isConfirmed() {
+		return confirmed;
+	}
+	
 	public int getXcoordinate() {
 		return xCoordinate;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	public int getYcoordinate() {
 		return yCoordinate;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	public int getSideLength() {
 		return sideLength;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	public Color getEdgeColor() {
-		if (edgeColor == null) return edgeColorOfSquare;
-		else return edgeColor;
+		return edgeColorOfSquare;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	public Color getInteriorColor() {
-		if (interiorColor == null) return interiorColorOfSquare;
-		else return interiorColor;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isConfirmed() {
-		return confirmed;
+		return interiorColorOfSquare;
 	}
 }

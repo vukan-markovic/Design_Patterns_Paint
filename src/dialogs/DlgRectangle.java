@@ -7,8 +7,7 @@ import java.awt.event.*;
 import shapes.Rectangle;
 
 /**
- * 
- * @author Vukan Markovic
+ * Class represent {@link JDialog} for adding or updating {@link Rectangle}.
  */
 public class DlgRectangle extends JDialog {
 	private static final long serialVersionUID = 1L;
@@ -25,18 +24,16 @@ public class DlgRectangle extends JDialog {
 	private int yCoordinate;
 	private int width;
 	private int height;
-	private Color edgeColor = Color.BLACK;
-	private Color interiorColor = Color.WHITE;
-	private Color edgeColorOfRectangle = Color.BLACK;
-	private Color interiorColorOfRectangle = Color.WHITE;
+	private Color edgeColor;
+	private Color interiorColor;
+	private Color edgeColorOfRectangle;
+	private Color interiorColorOfRectangle;
 	private boolean confirmed;
 	private JButton btnEdgeColor;
 	private JButton btnInteriorColor;
+	private int drawWidth;
+	private int drawHeight;
 
-	/**
-	 * 
-	 * @param arrayOfStrings
-	 */
 	public static void main(String [] arrayOfStrings) {
 		try {
 			DlgRectangle dialog = new DlgRectangle();
@@ -47,9 +44,6 @@ public class DlgRectangle extends JDialog {
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public DlgRectangle() {
 		setModal(true);
 		setResizable(false);
@@ -146,19 +140,33 @@ public class DlgRectangle extends JDialog {
 		{
 			btnInteriorColor = new JButton("Choose interior color");
 			btnInteriorColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			
-			btnInteriorColor.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent click) {
+			btnInteriorColor.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent click) {
 					interiorColor = JColorChooser.showDialog(null, "Colors pallete", interiorColorOfRectangle);
+					if (interiorColor != null) {
+						interiorColorOfRectangle= interiorColor;
+						if (interiorColorOfRectangle.equals(Color.BLACK)) btnInteriorColor.setForeground(Color.WHITE);
+						else if (interiorColorOfRectangle.equals(Color.WHITE)) btnInteriorColor.setForeground(Color.BLACK);
+						btnInteriorColor.setBackground(interiorColorOfRectangle);
+					}
 				}
 			});
 			
 			btnEdgeColor = new JButton("Choose edge color");
+			btnEdgeColor.setForeground(Color.WHITE);
 			btnEdgeColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			
-			btnEdgeColor.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent click) {
+			btnEdgeColor.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent click) {
 					edgeColor = JColorChooser.showDialog(null, "Colors pallete", edgeColorOfRectangle);
+					if (edgeColor != null) {
+						if (edgeColor.equals(Color.WHITE)) JOptionPane.showMessageDialog(null, "Background is white :D");
+						else {
+							edgeColorOfRectangle = edgeColor;
+							btnEdgeColor.setBackground(edgeColorOfRectangle);
+						}
+					}
 				}
 			});
 			
@@ -181,31 +189,25 @@ public class DlgRectangle extends JDialog {
 				JButton btnConfirm = new JButton("Confirm");
 				btnConfirm.setBackground(Color.GREEN);
 				btnConfirm.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				btnConfirm.addMouseListener(new MouseAdapter() {
-                	@Override
-        			public void mouseClicked(MouseEvent click) {
+				btnConfirm.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent click) {
 						if (txtXcoordinate.getText().isEmpty() || txtYcoordinate.getText().isEmpty() || txtWidth.getText().isEmpty() || txtHeight.getText().isEmpty())
 							JOptionPane.showMessageDialog(getParent(), "Values cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
 						else {
 							try {	
-								if(Integer.parseInt(txtWidth.getText()) <= 0) {
-									JOptionPane.showMessageDialog(getParent(), "Length of width must be greater than zero.", "Error", JOptionPane.ERROR_MESSAGE);
-									txtWidth.setText("");
-								}
-								else if(Integer.parseInt(txtHeight.getText()) <= 0) {
-									JOptionPane.showMessageDialog(getParent(), "Lenght of height must be greater than zero.", "Error", JOptionPane.ERROR_MESSAGE);
-									txtHeight.setText("");
-								} else {
+								xCoordinate = Integer.parseInt(txtXcoordinate.getText());
+								yCoordinate = Integer.parseInt(txtYcoordinate.getText());
+								width = Integer.parseInt(txtWidth.getText());
+								height = Integer.parseInt(txtHeight.getText());
+								if(xCoordinate <= 0 || yCoordinate <= 0 || width <= 0 || height <= 0) JOptionPane.showMessageDialog(getParent(), "X and Y coordinates of up left point, width and height of rectangle must be positive numbers!", "Error", JOptionPane.ERROR_MESSAGE);
+								else if (width + xCoordinate > drawWidth || height + yCoordinate > drawHeight) JOptionPane.showMessageDialog(null, "The rectangle goes out of drawing!");
+								else {
 									confirmed = true;
-									xCoordinate = Integer.parseInt(txtXcoordinate.getText());
-									yCoordinate = Integer.parseInt(txtYcoordinate.getText());
-									width = Integer.parseInt(txtWidth.getText());
-									height = Integer.parseInt(txtHeight.getText());
 									setVisible(false);
 									dispose();
 								}
 							} catch (NumberFormatException nfe) {
-								JOptionPane.showMessageDialog(getParent(),"Coordinates of point, width and height must be whole numbers!", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(getParent(),"X and Y coordinates of up left point, width and height of rectangle must be whole numbers!", "Error", JOptionPane.ERROR_MESSAGE);
 							} 
 						}  
 					}
@@ -233,37 +235,51 @@ public class DlgRectangle extends JDialog {
 		}
 	}
 
-	/**
-	 * 
-	 * @param xClick
-	 * @param yClick
+	/** 
+     * {@inheritDoc DlgCircle#write(int, int, int, int)}
 	 */
-	public void write(int xClick, int yClick) {
+	public void write(int xClick, int yClick, int drawWidth, int drawHeight) {
 		txtXcoordinate.setText(String.valueOf(xClick));
 		txtXcoordinate.setEnabled(false);
 		txtYcoordinate.setText(String.valueOf(yClick));
 		txtYcoordinate.setEnabled(false);
+		this.drawWidth = drawWidth;
+		this.drawHeight = drawHeight;
 	}
 
 	/**
+	 * <h3>Fill up fields with parameters of {@link Rectangle} that user want to update.</h3>
 	 * 
-	 * @param rectangle
+	 * @param rectangle Represent {@link Rectangle} that user want to update.
 	 */
-	public void fillUp(Rectangle rectangle) {
+	public void fillUp(Rectangle rectangle, int drawWidth, int drawHeight) {
 		txtXcoordinate.setText(String.valueOf((rectangle.getUpLeft().getXcoordinate())));
 		txtYcoordinate.setText(String.valueOf((rectangle.getUpLeft().getYcoordinate())));
 		txtWidth.setText(String.valueOf(rectangle.getWidth()));
 		txtHeight.setText(String.valueOf(rectangle.getSide()));
 		edgeColorOfRectangle = rectangle.getColor();
 		interiorColorOfRectangle = rectangle.getInteriorColor();
+		if (interiorColorOfRectangle.equals(Color.BLACK)) btnInteriorColor.setForeground(Color.WHITE);
+		else if (interiorColorOfRectangle.equals(Color.WHITE)) btnInteriorColor.setForeground(Color.BLACK);
+		btnEdgeColor.setBackground(edgeColorOfRectangle);
+		btnInteriorColor.setBackground(interiorColorOfRectangle);
+		this.drawWidth = drawWidth;
+		this.drawHeight = drawHeight;
 	}
 
 	/**
-	 * 
+	 * {@inheritDoc DlgSquare#deleteButtons()}
 	 */
 	public void deleteButtons() {
 		btnEdgeColor.setVisible(false);
 		btnInteriorColor.setVisible(false);
+	}
+	
+	/**
+     * {@inheritDoc DlgSquare#isConfirmed()}
+     */
+	public boolean isConfirmed() {
+		return confirmed;
 	}
 
 	public int getXcoordinate() {
@@ -283,20 +299,10 @@ public class DlgRectangle extends JDialog {
 	}
 
 	public Color getEdgeColor() {
-		if (edgeColor == null) return edgeColorOfRectangle;
-		else return edgeColor;
+		return edgeColorOfRectangle;
 	}
 
 	public Color getInteriorColor() {
-		if(interiorColor == null) return interiorColorOfRectangle;
-		else return interiorColor;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isConfirmed() {
-		return confirmed;
+		return interiorColorOfRectangle;
 	}
 }

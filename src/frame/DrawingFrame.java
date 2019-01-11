@@ -13,8 +13,9 @@ import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.BevelBorder;
 
 /**
- * 
  * @author Vukan Markovic
+ * @version 1.0
+ * @since 11.01.2019.
  */
 public class DrawingFrame extends JFrame implements PropertyChangeListener {
 	private static final long serialVersionUID = 1L;
@@ -406,7 +407,7 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 				else if (tglBtnDrawRectangle.isSelected()) controller.btnAddRectangleClicked(click);
 				else if (tglBtnDrawCircle.isSelected()) controller.btnAddCircleClicked(click);
 				else if (tglBtnDrawHexagon.isSelected()) controller.btnAddHexagonClicked(click);
-				if (tglBtnSelect.isSelected()) controller.btnSelectShapeClicked(click);
+				else if (tglBtnSelect.isSelected()) controller.btnSelectShapeClicked(click);
 			}
 		});
 		
@@ -417,76 +418,99 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 			}
 		});
 	}
-
-	/**
-	 * 
-	 * @param controller
-	 */
-	public void setController(DrawingController controller) {
-		this.controller = controller;
-		controller.addPropertyChangedListener(this);
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public DrawingView getView() {
-		return view;
-	}
 	
+	/**
+	 * Method that add listener to some button and enable it.
+	 * 
+	 * @param button Represent button which need to be updated.
+	 * @param adapter Represent adapter for that button.
+	 */
 	public void addListener(JButton button, MouseAdapter adapter) {
-		button.setEnabled(true);
-		button.addMouseListener(adapter);
+		if (!button.isEnabled()) {
+			button.setEnabled(true);
+			button.addMouseListener(adapter);
+		}
 	}
 	
+	/**
+	 * Method that remove listener from some button and disable it.
+	 * 
+	 * @param button Represent button which need to be updated.
+	 * @param adapter Represent adapter for that button.
+	 */
 	public void removeListener(JButton button, MouseAdapter adapter) {
-		button.removeMouseListener(adapter);
-		button.setEnabled(false);
+		if (button.isEnabled()) {
+			button.removeMouseListener(adapter);
+			button.setEnabled(false);
+		}
 	}
 	
+	/**
+	 * Listen to changes from {@link DrawingModel} that sends Subject - {@link DrawingController} to update buttons depend on state of draw.
+	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("shape selected")) {
+		switch(evt.getPropertyName()) {
+		case "shape selected":
 			addListener(btnDelete, mouseAdapterDelete);
-		} else if (evt.getPropertyName().equals("shape exist")) {
+			break;
+		case "shape exist":
 			tglBtnSelect.setEnabled(true);
-			addListener(btnUndo, mouseAdapterUndo);
-		} else if (evt.getPropertyName().equals("shape unselected") || evt.getPropertyName().equals("shape don't exist")) {
+			break;
+		case "shape unselected":
+		case "shape don't exist":
 			removeListener(btnUpdate, mouseAdapterUpdate);
 			removeListener(btnDelete, mouseAdapterDelete);
-		} else if (evt.getPropertyName().equals("shape don't exist") || evt.getPropertyName().equals("undo turn off")) {
-			tglBtnSelect.setEnabled(false);
-			removeListener(btnNewDraw, mouseAdapterNewDraw);
-			removeListener(btnUndo, mouseAdapterUndo);
-			removeListener(btnSaveDraw, mouseAdapterSaveDrawing);
+			break;
+		case "change position turn off":
 			removeListener(btnToBack, mouseAdapterToBack);
 			removeListener(btnToFront, mouseAdapterToFront);
 			removeListener(btnBringToBack, mouseAdapterBringToBack);
 			removeListener(btnBringToFront, mouseAdapterBringToFront);
-		} else if (evt.getPropertyName().equals("update turn off")) removeListener(btnUpdate, mouseAdapterUpdate);
-		else if (evt.getPropertyName().equals("update turn on")) addListener(btnUpdate, mouseAdapterUpdate);
-		else if (evt.getPropertyName().equals("redo turn off")) removeListener(btnRedo, mouseAdapterRedo);
-		else if (evt.getPropertyName().equals("redo turn on")) addListener(btnRedo, mouseAdapterRedo);
-		else if (evt.getPropertyName().equals("undo turn on")) addListener(btnUndo, mouseAdapterUndo);
-		else if (evt.getPropertyName().equals("change position turn on")) {
+			break;
+		case "update turn off":
+			removeListener(btnUpdate, mouseAdapterUpdate);
+			break;
+		case "update turn on": 
+			addListener(btnUpdate, mouseAdapterUpdate);
+			break;
+		case "redo turn off": 
+			removeListener(btnRedo, mouseAdapterRedo);
+			break;
+		case "redo turn on": 
+			addListener(btnRedo, mouseAdapterRedo);
+			break;
+		case "change position turn on":
 			addListener(btnToBack, mouseAdapterToBack);
 			addListener(btnToFront, mouseAdapterToFront);
 			addListener(btnBringToBack, mouseAdapterBringToBack);
 			addListener(btnBringToFront, mouseAdapterBringToFront);
-		} else if (evt.getPropertyName().equals("log turn off")) removeListener(btnLog, mouseAdapterLog);
-		else if (evt.getPropertyName().equals("log turn on")) addListener(btnLog, mouseAdapterLog);
-		else if (evt.getPropertyName().equals("draw is not empty")) {
+			break;
+		case "draw is not empty":
 			addListener(btnSaveDraw, mouseAdapterSaveDrawing);
 			addListener(btnNewDraw, mouseAdapterNewDraw);
-		}
-		else if (evt.getPropertyName().equals("draw is empty")) {
+			addListener(btnUndo, mouseAdapterUndo);
+			addListener(btnLog, mouseAdapterLog);
+			break;
+		case "draw is empty":
 			removeListener(btnSaveDraw, mouseAdapterSaveDrawing);
 			removeListener(btnNewDraw, mouseAdapterNewDraw);
+			removeListener(btnUndo, mouseAdapterUndo);
+			removeListener(btnLog, mouseAdapterLog);
+			break;
 		}
 	}
 	
 	public DefaultListModel<String> getList() {
 		return dlmList;
+	}
+	
+	public DrawingView getView() {
+		return view;
+	}
+	
+	public void setController(DrawingController controller) {
+		this.controller = controller;
+		controller.addPropertyChangedListener(this);
 	}
 }

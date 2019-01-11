@@ -7,11 +7,9 @@ import java.awt.event.*;
 import shapes.Point;
 
 /**
- * 
- * @author Vukan Markovic
+ * Class represent {@link JDialog} for adding or updating {@link Point}.
  */
 public class DlgPoint extends JDialog {
-
 	private static final long serialVersionUID = 1L;
 	private final JPanel mainPanel;
 	private JTextField txtXcoordinate;
@@ -22,13 +20,11 @@ public class DlgPoint extends JDialog {
 	private int yCoordinate;
 	private boolean confirmed;
 	private JButton btnColor;
-	private Color color = Color.BLACK;
-	private Color pointColor = Color.BLACK;
-
-	/**
-	 * 
-	 * @param arrayOfStrings
-	 */
+	private Color color;
+	private Color pointColor;
+	private int drawWidth;
+	private int drawHeight;
+	
 	public static void main(String [] arrayOfStrings) {
 		try {
 			DlgPoint dialog = new DlgPoint();
@@ -39,9 +35,6 @@ public class DlgPoint extends JDialog {
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public DlgPoint() {
 		setModal(true);
 		setResizable(false);
@@ -100,11 +93,19 @@ public class DlgPoint extends JDialog {
 		}
 		
 		btnColor = new JButton("Choose color");
+		btnColor.setForeground(Color.WHITE);
 		btnColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		
-		btnColor.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent click) {
+		btnColor.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
 				color = JColorChooser.showDialog(null, "Colors pallete", pointColor);
+				if (color != null) {
+					if (color.equals(Color.WHITE)) JOptionPane.showMessageDialog(null, "Background is white :D");
+					else {
+						pointColor = color;
+						btnColor.setBackground(pointColor);
+					}
+				}
 			}
 		});
 		
@@ -122,22 +123,22 @@ public class DlgPoint extends JDialog {
 				JButton btnConfirm = new JButton("Confirm");
 				btnConfirm.setBackground(Color.GREEN);
 				btnConfirm.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				btnConfirm.addMouseListener(new MouseAdapter() {
-                	@Override
-        			public void mouseClicked(MouseEvent click) {
-						if (txtXcoordinate.getText().isEmpty() || txtYcoordinate.getText().isEmpty()) 
-							JOptionPane.showMessageDialog(getParent(), "Values cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+				btnConfirm.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent click) {
+						if (txtXcoordinate.getText().isEmpty() || txtYcoordinate.getText().isEmpty()) JOptionPane.showMessageDialog(getParent(), "Values cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
 						else {
 							try {	
-								confirmed = true;
 								xCoordinate = Integer.parseInt(txtXcoordinate.getText());
 								yCoordinate = Integer.parseInt(txtYcoordinate.getText());
-								setVisible(false);
-								dispose();
+								if (xCoordinate <= 0 || yCoordinate <= 0) JOptionPane.showMessageDialog(null, "X and Y coordinates of point must be positive numbers!");
+								else if (xCoordinate > drawWidth || yCoordinate > drawHeight) JOptionPane.showMessageDialog(null, "The point goes out of drawing!");
+								else {
+									confirmed = true;
+									setVisible(false);
+									dispose();
+								}
 							} catch (NumberFormatException nfe) {
-								JOptionPane.showMessageDialog(getParent(),"Coordinates of point must be whole numbers!", "Error", JOptionPane.ERROR_MESSAGE);
-								txtXcoordinate.setText("");
-								txtYcoordinate.setText("");
+								JOptionPane.showMessageDialog(getParent(),"X and Y coordinates of point must be whole numbers!", "Error", JOptionPane.ERROR_MESSAGE);
 							} 
 						}  
 					}
@@ -165,46 +166,34 @@ public class DlgPoint extends JDialog {
 		}
 	}
 
-	/**
-	 * 
-	 * @param point
+	/** 
+     * {@inheritDoc DlgCircle#write(int, int, int, int)}
 	 */
-	public void write(Point point) {
+	public void write(Point point, int drawWidth, int drawHeight) {
 		txtXcoordinate.setText(String.valueOf(point.getXcoordinate()));
 		txtYcoordinate.setText(String.valueOf(point.getYcoordinate()));
 		pointColor = point.getColor();
+		btnColor.setBackground(pointColor);
+		this.drawWidth = drawWidth;
+		this.drawHeight = drawHeight;
 	}
-
+	
 	/**
-	 * 
-	 * @return
-	 */
-	public int getXcoordinate() {
-		return xCoordinate;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public int getYcoordinate() {
-		return yCoordinate;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
+     * {@inheritDoc DlgSquare#isConfirmed()}
+     */
 	public boolean isConfirmed() {
 		return confirmed;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
+	public int getXcoordinate() {
+		return xCoordinate;
+	}
+
+	public int getYcoordinate() {
+		return yCoordinate;
+	}
+
 	public Color getColor() {
-		if (color == null) return pointColor;
-		else return color;
+		return pointColor;
 	}
 }

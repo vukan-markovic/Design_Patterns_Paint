@@ -1,12 +1,9 @@
 package commands;
 
 import javax.swing.DefaultListModel;
-
 import shapes.Point;
 
 /**
- * @author Vukan Marković
- *
  * Class that represent command for update existing point from the draw.
  */
 public class CmdUpdatePoint implements Command {
@@ -29,8 +26,7 @@ public class CmdUpdatePoint implements Command {
 	 */
 	@Override
 	public void execute() {
-		oldState.setXcoordinate(newState.getXcoordinate());
-		oldState.setYcoordinate(newState.getYcoordinate());
+		oldState.moveTo(newState.getXcoordinate(), newState.getYcoordinate());
 		oldState.setColor(newState.getColor());
 		log.addElement(command);
 	}

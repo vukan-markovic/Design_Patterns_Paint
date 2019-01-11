@@ -1,13 +1,10 @@
 package commands;
 
 import javax.swing.DefaultListModel;
-
 import model.DrawingModel;
 import shapes.Shape;
 
 /**
- * @author Vukan Marković
- *
  * Class that represent command for add new shape to the draw.
  */
 public class CmdAddShape implements Command {

@@ -6,8 +6,6 @@ import hexagon.Hexagon;
 import shapes.SurfaceShape;
 
 /**
- * @author Vukan Marković
- *
  * Class that is adapter for hexagon.jar library (Hexagon class).
  */
 public class HexagonAdapter extends SurfaceShape {
@@ -33,10 +31,27 @@ public class HexagonAdapter extends SurfaceShape {
 	public boolean equals(Object obj) {
 		if (obj instanceof HexagonAdapter) {
 			Hexagon hexaFromObj = ((HexagonAdapter) obj).hexagon;
-			return hexagon.getX() == hexaFromObj.getX() && hexagon.getY() == hexaFromObj.getY()
-					&& hexagon.getR() == hexaFromObj.getR();
+			return hexagon.getX() == hexaFromObj.getX() && hexagon.getY() == hexaFromObj.getY() && hexagon.getR() == hexaFromObj.getR();
 		}
 		return false;
+	}
+	
+	@Override
+	public String toString() {
+		return "Hexagon: radius=" + hexagon.getR() + "; x=" + hexagon.getX() + "; y=" + hexagon.getY() + "; edge color=" + getColor().toString().substring(14).replace('=', '-') + "; area color=" + getInteriorColor().toString().substring(14).replace('=', '-');
+	}
+	
+	/**
+	 * Move hexagon to given place.
+	 * 
+	 * @param x X coordinate of place to move.
+	 * @param y Y coordinate of place to move.
+	 */
+	
+	@Override
+	public void moveTo(int x, int y) {
+		hexagon.setX(x);
+		hexagon.setY(y);
 	}
 	
 	/**
@@ -58,27 +73,6 @@ public class HexagonAdapter extends SurfaceShape {
 	public boolean containsClick(int xCoordinate, int yCoordinate) {
 		return hexagon.doesContain(xCoordinate, yCoordinate);
 	}
-
-	/**
-	 * Implemented in {@link #draw(Graphics)}.
-	 * 
-	 * @param Graphics {@docRoot#Graphics}
-	 */
-	@Override
-	public void fillUpShape(Graphics shapeForFillUp) {}
-
-	/**
-	 * Move hexagon to given place.
-	 * 
-	 * @param x X coordinate of place to move.
-	 * @param y Y coordinate of place to move.
-	 */
-	
-	@Override
-	public void moveTo(int x, int y) {
-		hexagon.setX(x);
-		hexagon.setY(y);
-	}
 	
 	/**
 	 * Make new instance of this class.
@@ -91,6 +85,14 @@ public class HexagonAdapter extends SurfaceShape {
 		h.setAreaColor(getInteriorColor());
 		return new HexagonAdapter(hexagon);
 	}
+
+	/**
+	 * Implemented in {@link #draw(Graphics)}.
+	 * 
+	 * @param Graphics {@docRoot#Graphics}
+	 */
+	@Override
+	public void fillUpShape(Graphics shapeForFillUp) {}
 	
 	/**
 	 * Check if hexagon is selected.
@@ -113,11 +115,6 @@ public class HexagonAdapter extends SurfaceShape {
 		super.setSelected(selected);
 	}
 	
-	@Override
-	public String toString() {
-		return "Hexagon: radius=" + hexagon.getR() + "; x=" + hexagon.getX() + "; y=" + hexagon.getY() + "; edge color=" + getColor().toString().substring(14).replace('=', '-') + "; area color=" + getInteriorColor().toString().substring(14).replace('=', '-');
-	}
-	
 	public Color getColor() {
 		return hexagon.getBorderColor();
 	}
@@ -136,19 +133,19 @@ public class HexagonAdapter extends SurfaceShape {
 		hexagon.setAreaColor(color);
 	}
 	
-	public int getXcoordinate() {
-		return hexagon.getX();
-	}
-	
-	public int getYcoordinate() {
-		return hexagon.getY();
-	}
-	
 	public int getR() {
 		return hexagon.getR();
 	}
 	
 	public void setR(int r) {
 		hexagon.setR(r);
+	}
+	
+	public int getXcoordinate() {
+		return hexagon.getX();
+	}
+	
+	public int getYcoordinate() {
+		return hexagon.getY();
 	}
 }

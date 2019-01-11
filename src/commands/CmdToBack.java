@@ -1,13 +1,10 @@
 package commands;
 
 import javax.swing.DefaultListModel;
-
 import model.DrawingModel;
 import shapes.Shape;
 
 /**
- * @author Vukan Marković
- *
  * Class that represent command for bring some shape one position to the back.
  */
 public class CmdToBack implements Command {
