@@ -1,6 +1,5 @@
 package commands;
 
-import javax.swing.DefaultListModel;
 import shapes.Circle;
 
 /**
@@ -10,15 +9,10 @@ public class CmdUpdateCircle implements Command {
 	private Circle oldState;
 	private Circle newState;
 	private Circle originalState;
-	private DefaultListModel<String> log;
-	private String command;
 	
-	public CmdUpdateCircle(Circle oldState, Circle newState, DefaultListModel<String> log) {
+	public CmdUpdateCircle(Circle oldState, Circle newState) {
 		this.oldState = oldState;
 		this.newState = newState;
-		this.log = log;
-		originalState = oldState.clone();
-		command = "Updated->" + oldState.toString() + "->" + newState.toString();
 	}
 	
 	/**
@@ -26,11 +20,11 @@ public class CmdUpdateCircle implements Command {
 	 */
 	@Override
 	public void execute() {
+		originalState = oldState.clone();
 		oldState.setRadius(newState.getRadius());
 		oldState.setCenter(newState.getCenter().clone());
 		oldState.setInteriorColor(newState.getInteriorColor());
 		oldState.setColor(newState.getColor());
-		log.addElement(command);
 	}
 
 	/**
@@ -42,6 +36,5 @@ public class CmdUpdateCircle implements Command {
 		oldState.setCenter(originalState.getCenter().clone());
 		oldState.setInteriorColor(originalState.getInteriorColor());
 		oldState.setColor(originalState.getColor());
-		log.removeElement(command);
 	}
 }

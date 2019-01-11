@@ -1,6 +1,5 @@
 package commands;
 
-import javax.swing.DefaultListModel;
 import shapes.Point;
 
 /**
@@ -10,15 +9,10 @@ public class CmdUpdatePoint implements Command {
 	private Point oldState;
 	private Point newState;
 	private Point originalState;
-	private DefaultListModel<String> log;
-	private String command;
 	
-	public CmdUpdatePoint(Point oldState, Point newState, DefaultListModel<String> log) {
+	public CmdUpdatePoint(Point oldState, Point newState) {
 		this.oldState = oldState;
 		this.newState = newState;
-		this.log = log;
-		originalState = oldState.clone();
-		command = "Updated->" + oldState.toString() + "->" + newState.toString();
 	}
 	
 	/**
@@ -26,9 +20,9 @@ public class CmdUpdatePoint implements Command {
 	 */
 	@Override
 	public void execute() {
+		originalState = oldState.clone();
 		oldState.moveTo(newState.getXcoordinate(), newState.getYcoordinate());
 		oldState.setColor(newState.getColor());
-		log.addElement(command);
 	}
 
 	/**
@@ -39,6 +33,5 @@ public class CmdUpdatePoint implements Command {
 		oldState.setXcoordinate(originalState.getXcoordinate());
 		oldState.setYcoordinate(originalState.getYcoordinate());
 		oldState.setColor(originalState.getColor());
-		log.removeElement(command);
 	}
 }

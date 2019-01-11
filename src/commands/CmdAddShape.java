@@ -1,6 +1,5 @@
 package commands;
 
-import javax.swing.DefaultListModel;
 import model.DrawingModel;
 import shapes.Shape;
 
@@ -10,14 +9,10 @@ import shapes.Shape;
 public class CmdAddShape implements Command {
 	private Shape shape;
 	private DrawingModel model;
-	private DefaultListModel<String> log;
-	private String command;
 	
-	public CmdAddShape(Shape shape, DrawingModel model, DefaultListModel<String> log) {
+	public CmdAddShape(Shape shape, DrawingModel model) {
 		this.shape = shape;
 		this.model = model;
-		this.log = log;
-		command = "Added->" + shape.toString();
 	}
 	
 	/**
@@ -26,7 +21,6 @@ public class CmdAddShape implements Command {
 	@Override
 	public void execute() {
 		model.add(shape);
-		log.addElement(command);
 	}
 
 	/**
@@ -35,6 +29,5 @@ public class CmdAddShape implements Command {
 	@Override
 	public void unexecute() {	
 		model.remove(shape);
-		log.removeElement(command);
 	}
 }

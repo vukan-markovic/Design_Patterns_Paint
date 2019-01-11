@@ -32,6 +32,7 @@ public class Square extends SurfaceShape {
     public void draw(Graphics graphics) {
         graphics.setColor(getColor());
         graphics.drawRect(upLeft.getXcoordinate(), upLeft.getYcoordinate(), side, side);
+        fillUpShape(graphics);
         if (isSelected()) selected(graphics);
     }
     

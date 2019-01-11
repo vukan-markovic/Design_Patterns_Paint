@@ -1,6 +1,5 @@
 package commands;
 
-import javax.swing.DefaultListModel;
 import shapes.Rectangle;
 
 /**
@@ -12,15 +11,10 @@ public class CmdUpdateRectangle implements Command {
 	private Rectangle oldState;
 	private Rectangle newState;
 	private Rectangle originalState;
-	private DefaultListModel<String> log;
-	private String command;
 	
-	public CmdUpdateRectangle(Rectangle oldState, Rectangle newState, DefaultListModel<String> log) {
+	public CmdUpdateRectangle(Rectangle oldState, Rectangle newState) {
 		this.oldState = oldState;
 		this.newState = newState;
-		this.log = log;
-		originalState = (Rectangle) oldState.clone();
-		command = "Updated->" + oldState.toString() + "->" + newState.toString();
 	}
 	
 	/**
@@ -28,12 +22,12 @@ public class CmdUpdateRectangle implements Command {
 	 */
 	@Override
 	public void execute() {
+		originalState = (Rectangle) oldState.clone();
 		oldState.setUpLeft(newState.getUpLeft().clone());
 		oldState.setWidth(newState.getWidth());
 		oldState.setSide(newState.getSide());
 		oldState.setColor(newState.getColor());
 		oldState.setInteriorColor(newState.getInteriorColor());
-		log.addElement(command);
 	}
 
 	/**
@@ -46,6 +40,5 @@ public class CmdUpdateRectangle implements Command {
 		oldState.setSide(originalState.getSide());
 		oldState.setColor(originalState.getColor());
 		oldState.setInteriorColor(originalState.getInteriorColor());
-		log.removeElement(command);
 	}
 }

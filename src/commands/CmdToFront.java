@@ -1,6 +1,5 @@
 package commands;
 
-import javax.swing.DefaultListModel;
 import model.DrawingModel;
 import shapes.Shape;
 
@@ -10,14 +9,11 @@ import shapes.Shape;
 public class CmdToFront implements Command {
 	private DrawingModel model;
 	private Shape shape;
-	private DefaultListModel<String> log;
 	private int index;
-	private String command;
 
-	public CmdToFront(DrawingModel model, Shape shape, DefaultListModel<String> log) {
+	public CmdToFront(DrawingModel model, Shape shape) {
 		this.model = model;
 		this.shape = shape;
-		this.log = log;
 	}
 
 	/**
@@ -28,8 +24,6 @@ public class CmdToFront implements Command {
 		index =  model.getIndexOfShape(shape);
 		model.removeShapeAtIndex(index);
 		model.addShapeToIndex(index + 1, shape);
-		command = "Moved to front->" + shape.toString();
-		log.addElement(command);
 	}
 
 	/**
@@ -39,6 +33,5 @@ public class CmdToFront implements Command {
 	public void unexecute() {
 		model.removeShapeAtIndex(index + 1);
 		model.addShapeToIndex(index, shape);
-		log.removeElement(command);
 	}
 }
