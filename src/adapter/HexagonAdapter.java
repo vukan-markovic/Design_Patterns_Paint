@@ -3,6 +3,7 @@ package adapter;
 import java.awt.Color;
 import java.awt.Graphics;
 import hexagon.Hexagon;
+import shapes.Shape;
 import shapes.SurfaceShape;
 
 /**
@@ -27,6 +28,9 @@ public class HexagonAdapter extends SurfaceShape {
 		hexagon.setSelected(isSelected());
 	}
 
+	/**
+	 * Determine if two hexagons are equal depend on their x and y coordinates and radius length.
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof HexagonAdapter) {
@@ -36,6 +40,18 @@ public class HexagonAdapter extends SurfaceShape {
 		return false;
 	}
 	
+	/**
+	 * Compares two hexagons depend on their radius.
+	 */
+	@Override
+	public int compareTo(Shape hex) {
+		if (hex instanceof HexagonAdapter) return hexagon.getR() - ((HexagonAdapter) hex).getR();
+		return 0;
+	}
+	
+	/**
+	 * Print hexagon values.
+	 */
 	@Override
 	public String toString() {
 		return "Hexagon: radius=" + hexagon.getR() + "; x=" + hexagon.getX() + "; y=" + hexagon.getY() + "; edge color=" + getColor().toString().substring(14).replace('=', '-') + "; area color=" + getInteriorColor().toString().substring(14).replace('=', '-');
@@ -94,21 +110,11 @@ public class HexagonAdapter extends SurfaceShape {
 	@Override
 	public void fillUpShape(Graphics shapeForFillUp) {}
 	
-	/**
-	 * Check if hexagon is selected.
-	 * 
-	 * @return boolean Indicate if hexagon is selected.
-	 */
 	@Override
 	public boolean isSelected() {
 		return hexagon.isSelected();
 	}
 
-	/**
-	 * Set hexagon selected state to given value. 
-	 * 
-	 * @param selected Boolean that indicate if hexagon is selected or not.
-	 */
 	@Override
 	public void setSelected(boolean selected) {
 		hexagon.setSelected(selected);

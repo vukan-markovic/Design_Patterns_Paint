@@ -251,17 +251,33 @@ public class DrawingController {
 				shape.setSelected(false);
 			}
 			selected = true;
+			
+			if (counter == 1)  {
+				propertyChangeSupport.firePropertyChange("update turn on", false, true);
+				propertyChangeSupport.firePropertyChange("shape selected", false, true);
+			}  
+			else if (counter > 1) {
+				propertyChangeSupport.firePropertyChange("update turn off", false, true);
+				propertyChangeSupport.firePropertyChange("change position turn off", false, true);
+			}
+			if (counter == 1 && model.getAll().size() >= 2) {
+				if (model.getIndexOfShape(shape) != 0) {
+					propertyChangeSupport.firePropertyChange("to back turn on", false, true);
+					propertyChangeSupport.firePropertyChange("bring to back turn on", false, true);
+				} else {
+					propertyChangeSupport.firePropertyChange("to back turn off", false, true);
+					propertyChangeSupport.firePropertyChange("bring to back turn off", false, true);
+				}
+				if (model.getIndexOfShape(shape) != model.getAll().size() - 1) {
+					propertyChangeSupport.firePropertyChange("to front turn on", false, true);
+					propertyChangeSupport.firePropertyChange("bring to front turn on", false, true);
+				} else {
+					propertyChangeSupport.firePropertyChange("to front turn off", false, true);
+					propertyChangeSupport.firePropertyChange("bring to front turn off", false, true);
+				}
+			}
 		}
 		
-		if (counter == 1)  {
-			propertyChangeSupport.firePropertyChange("update turn on", false, true);
-			propertyChangeSupport.firePropertyChange("shape selected", false, true);
-		}  
-		else if (counter > 1) {
-			propertyChangeSupport.firePropertyChange("update turn off", false, true);
-			propertyChangeSupport.firePropertyChange("change position turn off", false, true);
-		}
-		if (counter == 1 && model.getAll().size() >= 2) propertyChangeSupport.firePropertyChange("change position turn on", false, true);
 		if (!selected) unselect();
 		else selected = false;
 		frame.getView().repaint();	
@@ -548,8 +564,18 @@ public class DrawingController {
 	 */ 
 	public void toFront() {
 		Shape shape = getSelectedShape();
-		if (model.getIndexOfShape(shape) == model.getAll().size() - 1) JOptionPane.showMessageDialog(null, "Shape is on top!");
-		else executeCommand(new CmdToFront(model, shape, log));
+		if (model.getIndexOfShape(shape) == model.getAll().size() - 1) JOptionPane.showMessageDialog(null, "Shape is already on top!");
+		else {
+			if (model.getIndexOfShape(shape) == model.getAll().size() - 2) {
+				propertyChangeSupport.firePropertyChange("to front turn off", false, true);
+				propertyChangeSupport.firePropertyChange("bring to front turn off", false, true);
+			}
+			else if (model.getIndexOfShape(shape) == 0) {
+				propertyChangeSupport.firePropertyChange("to back turn on", false, true);
+				propertyChangeSupport.firePropertyChange("bring to back turn on", false, true);
+			}
+			executeCommand(new CmdToFront(model, shape, log));
+		}
 	}
 
 	/**
@@ -558,7 +584,13 @@ public class DrawingController {
 	public void bringToFront() {
 		Shape shape = getSelectedShape();
 		if (model.getIndexOfShape(shape) == model.getAll().size() - 1) JOptionPane.showMessageDialog(null, "Shape is already on top!");
-		else executeCommand(new CmdBringToFront(model, shape, log, model.getAll().size() - 1));
+		else {
+			propertyChangeSupport.firePropertyChange("to front turn off", false, true);
+			propertyChangeSupport.firePropertyChange("bring to front turn off", false, true);
+			propertyChangeSupport.firePropertyChange("to back turn on", false, true);
+			propertyChangeSupport.firePropertyChange("bring to back turn on", false, true);
+			executeCommand(new CmdBringToFront(model, shape, log, model.getAll().size() - 1));
+		}
 	}
 
 	/**
@@ -566,8 +598,18 @@ public class DrawingController {
 	 */ 
 	public void toBack() {
 		Shape shape = getSelectedShape();
-		if (model.getIndexOfShape(shape) == 0) JOptionPane.showMessageDialog(null, "Shape is on first place!");
-		else executeCommand(new CmdToBack(model, shape, log));
+		if (model.getIndexOfShape(shape) == 0) JOptionPane.showMessageDialog(null, "Shape is already on bottom!");
+		else {
+			if (model.getIndexOfShape(shape) == 1) {
+				propertyChangeSupport.firePropertyChange("to back turn off", false, true);
+				propertyChangeSupport.firePropertyChange("bring to back turn off", false, true);
+			}
+			else if (model.getIndexOfShape(shape) == model.getAll().size() - 1) {
+				propertyChangeSupport.firePropertyChange("to front turn on", false, true);
+				propertyChangeSupport.firePropertyChange("bring to front turn on", false, true);
+			}
+			executeCommand(new CmdToBack(model, shape, log));
+		}
 	}
 
 	/**
@@ -575,8 +617,14 @@ public class DrawingController {
 	 */ 
 	public void bringToBack() {
 		Shape shape = getSelectedShape();
-		if (model.getIndexOfShape(shape) == 0) JOptionPane.showMessageDialog(null, "Shape is already on first place!");
-		else executeCommand(new CmdBringToBack(model, shape, log));
+		if (model.getIndexOfShape(shape) == 0) JOptionPane.showMessageDialog(null, "Shape is already on bottom!");
+		else {
+			propertyChangeSupport.firePropertyChange("to back turn off", false, true);
+			propertyChangeSupport.firePropertyChange("bring to back turn off", false, true);
+			propertyChangeSupport.firePropertyChange("to front turn on", false, true);
+			propertyChangeSupport.firePropertyChange("bring to front turn on", false, true);
+			executeCommand(new CmdBringToBack(model, shape, log));
+		}
 	}
 	
 	/**

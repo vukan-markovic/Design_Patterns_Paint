@@ -96,34 +96,34 @@ public class FileLog implements FileHandler {
 		try {
 			String[] commands1 = command.split("->");
 			switch(commands1[0]) {
-			case "Added":
-				controller.executeCommand(new CmdAddShape(parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), model, frame.getList())); 
-				break;
-			case "Updated":
-				Shape shape1 = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
-				int index = model.getIndexOfShape(shape1);
-				if (shape1 instanceof Point) controller.executeCommand(new CmdUpdatePoint((Point) model.getShapeByIndex(index), parsePoint(commands1[2].split(":")[1]), frame.getList()));
-				else if (shape1 instanceof Line) controller.executeCommand(new CmdUpdateLine((Line) model.getShapeByIndex(index), parseLine(commands1[2].split(":")[1]), frame.getList()));
-				else if (shape1 instanceof Rectangle) controller.executeCommand(new CmdUpdateRectangle((Rectangle) model.getShapeByIndex(index), parseRectangle(commands1[2].split(":")[1]), frame.getList()));
-				else if (shape1 instanceof Square) controller.executeCommand(new CmdUpdateSquare((Square) model.getShapeByIndex(index), parseSquare(commands1[2].split(":")[1]), frame.getList()));
-				else if (shape1 instanceof Circle) controller.executeCommand(new CmdUpdateCircle((Circle) model.getShapeByIndex(index), parseCircle(commands1[2].split(":")[1]), frame.getList()));
-				else if (shape1 instanceof HexagonAdapter) controller.executeCommand(new CmdUpdateHexagon((HexagonAdapter) model.getShapeByIndex(index), parseHexagon(commands1[2].split(":")[1]), frame.getList()));
-				break;
-			case "Deleted":
-				controller.executeCommand(new CmdRemoveShape(parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), model, frame.getList())); 
-				break;
-			case "Moved to front":
-				controller.executeCommand(new CmdToFront(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log));
-				break;
-			case "Moved to back":
-				controller.executeCommand(new CmdToBack(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log));
-				break;
-			case "Bringed to front":
-				controller.executeCommand(new CmdBringToFront(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log, model.getAll().size() - 1));
-				break;
-			case "Bringed to back":
-				controller.executeCommand(new CmdBringToBack(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log));
-				break;
+				case "Added":
+					controller.executeCommand(new CmdAddShape(parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), model, frame.getList())); 
+					break;
+				case "Updated":
+					Shape shape1 = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
+					int index = model.getIndexOfShape(shape1);
+					if (shape1 instanceof Point) controller.executeCommand(new CmdUpdatePoint((Point) model.getShapeByIndex(index), parsePoint(commands1[2].split(":")[1]), log));
+					else if (shape1 instanceof Line) controller.executeCommand(new CmdUpdateLine((Line) model.getShapeByIndex(index), parseLine(commands1[2].split(":")[1]), log));
+					else if (shape1 instanceof Rectangle) controller.executeCommand(new CmdUpdateRectangle((Rectangle) model.getShapeByIndex(index), parseRectangle(commands1[2].split(":")[1]), log));
+					else if (shape1 instanceof Square) controller.executeCommand(new CmdUpdateSquare((Square) model.getShapeByIndex(index), parseSquare(commands1[2].split(":")[1]), log));
+					else if (shape1 instanceof Circle) controller.executeCommand(new CmdUpdateCircle((Circle) model.getShapeByIndex(index), parseCircle(commands1[2].split(":")[1]), log));
+					else if (shape1 instanceof HexagonAdapter) controller.executeCommand(new CmdUpdateHexagon((HexagonAdapter) model.getShapeByIndex(index), parseHexagon(commands1[2].split(":")[1]), log));
+					break;
+				case "Deleted":
+					controller.executeCommand(new CmdRemoveShape(parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), model, log)); 
+					break;
+				case "Moved to front":
+					controller.executeCommand(new CmdToFront(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log));
+					break;
+				case "Moved to back":
+					controller.executeCommand(new CmdToBack(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log));
+					break;
+				case "Bringed to front":
+					controller.executeCommand(new CmdBringToFront(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log, model.getAll().size() - 1));
+					break;
+				case "Bringed to back":
+					controller.executeCommand(new CmdBringToBack(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log));
+					break;
 			}
 		
 			String line = reader.readLine();

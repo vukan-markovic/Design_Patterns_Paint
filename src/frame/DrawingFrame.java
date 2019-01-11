@@ -51,27 +51,6 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 	private JList<String> activityLog;
 	private DefaultListModel <String> dlmList;
 	private JScrollPane scrollPane;
-	
-	/**
-	 * 
-	 * @param arrayOfStrings
-	 */
-	public static void main(String[] arrayOfStrings) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					DrawingFrame frame = new DrawingFrame();
-					frame.setVisible(true);
-					frame.setTitle("Markovic Vukan IT20/2016");
-					DrawingModel model = new DrawingModel();
-					frame.getView().setModel(model);
-					frame.setController(new DrawingController(model, frame));
-				} catch (Exception exception) {
-					exception.printStackTrace();
-				}
-			}
-		});
-	}
 
 	public DrawingFrame() {
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -491,12 +470,6 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 		case "redo turn on": 
 			addListener(btnRedo, mouseAdapterRedo);
 			break;
-		case "change position turn on":
-			addListener(btnToBack, mouseAdapterToBack);
-			addListener(btnToFront, mouseAdapterToFront);
-			addListener(btnBringToBack, mouseAdapterBringToBack);
-			addListener(btnBringToFront, mouseAdapterBringToFront);
-			break;
 		case "draw is not empty":
 			addListener(btnSaveDraw, mouseAdapterSaveDrawing);
 			addListener(btnNewDraw, mouseAdapterNewDraw);
@@ -512,6 +485,30 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 		case "draw is loaded":
 			tglBtnSelect.setEnabled(true);
 			addListener(btnNewDraw, mouseAdapterNewDraw);
+			break;
+		case "to back turn on":
+			addListener(btnToBack, mouseAdapterToBack);
+			break;
+		case "to back turn off":
+			removeListener(btnToBack, mouseAdapterToBack);
+			break;
+		case "to front turn on":
+			addListener(btnToFront, mouseAdapterToFront);
+			break;
+		case "to front turn off":
+			removeListener(btnToFront, mouseAdapterToFront);
+			break;
+		case "bring to back turn on":
+			addListener(btnBringToBack, mouseAdapterBringToBack);
+			break;
+		case "bring to back turn off":
+			removeListener(btnBringToBack, mouseAdapterBringToBack);
+			break;
+		case "bring to front turn on":
+			addListener(btnBringToFront, mouseAdapterBringToFront);
+			break;
+		case "bring to front turn off":
+			removeListener(btnBringToFront, mouseAdapterBringToFront);
 			break;
 		}
 	}

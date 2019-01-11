@@ -33,7 +33,7 @@ public class Circle extends SurfaceShape {
     }
     
     /**
-     * Compare two circles by center and radius.
+     * Determine if two circles are equal by center and radius.
      */
     @Override
 	public boolean equals(Object obj) {
@@ -42,6 +42,15 @@ public class Circle extends SurfaceShape {
 			return center.equals(castedObj.getCenter()) && radius == castedObj.getRadius();
 		}
 		return false;
+	}
+    
+    /**
+     * Compare two circles by radius length.
+     */
+    @Override
+	public int compareTo(Shape o) {
+		if (o instanceof Circle) return radius - ((Circle) o).getRadius();
+		return 0;
 	}
     
     /**
