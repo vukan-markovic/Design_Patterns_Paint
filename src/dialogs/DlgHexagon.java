@@ -12,7 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
@@ -21,12 +20,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-
 import adapter.HexagonAdapter;
 
 /**
- * 
- * @author Vukan Markovic
+ * Class represent {@link JDialog} for adding or updating {@link HexagonAdapter}.
  */
 public class DlgHexagon extends JDialog {
     private static final long serialVersionUID = 1L;
@@ -40,17 +37,16 @@ public class DlgHexagon extends JDialog {
     private int xCoordinate;
     private int yCoordinate;
     private int radiusLength;
-    private Color edgeColor = Color.BLACK;
-    private Color interiorColor = Color.WHITE;
+    private Color edgeColor;
+    private Color interiorColor;
     private boolean confirmed;
-    private Color edgeColorOfHexagon = Color.BLACK;
-    private Color interiorColorOfHexagon = Color.WHITE;
+    private Color edgeColorOfHexagon;
+    private Color interiorColorOfHexagon;
     private JButton btnEdgeColor;
     private JButton btnInteriorColor;
+	private int drawWidth;
+	private int drawHeight;
 
-    /**
-     * @param arrayOfStrings
-     */
     public static void main(String[] arrayOfStrings) {
         try {
             DlgHexagon dialog = new DlgHexagon();
@@ -61,9 +57,6 @@ public class DlgHexagon extends JDialog {
         }
     }
 
-    /**
-     * 
-     */
     public DlgHexagon() {
         setModal(true);
         setResizable(false);
@@ -145,20 +138,34 @@ public class DlgHexagon extends JDialog {
         btnInteriorColor = new JButton("Choose interior color");
         btnInteriorColor.setFont(new Font("Arial", Font.BOLD, 12));
         btnInteriorColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        btnInteriorColor.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent click) {
+        btnInteriorColor.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
                 interiorColor = JColorChooser.showDialog(null, "Color pallete", interiorColorOfHexagon);
+                if (interiorColor != null) {
+					interiorColorOfHexagon = interiorColor;
+					if (interiorColorOfHexagon.equals(Color.BLACK)) btnInteriorColor.setForeground(Color.WHITE);
+					else if (interiorColorOfHexagon.equals(Color.WHITE)) btnInteriorColor.setForeground(Color.BLACK);
+					btnInteriorColor.setBackground(interiorColorOfHexagon);
+				}
             }
         });
 
         btnEdgeColor = new JButton("Choose edge color");
         btnEdgeColor.setFont(new Font("Arial", Font.BOLD, 12));
+        btnEdgeColor.setForeground(Color.WHITE);
         btnEdgeColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        btnEdgeColor.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent click) {
+        btnEdgeColor.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
                 edgeColor = JColorChooser.showDialog(null, "Color pallete", edgeColorOfHexagon);
+                if (edgeColor != null) {
+					if (edgeColor.equals(Color.WHITE)) JOptionPane.showMessageDialog(null, "Background is white :D");
+					else {
+						edgeColorOfHexagon = edgeColor;
+						btnEdgeColor.setBackground(edgeColorOfHexagon);
+					}
+				}
             }
         });
 
@@ -183,26 +190,23 @@ public class DlgHexagon extends JDialog {
                 btnConfirm.setFont(new Font("Arial", Font.BOLD, 12));
                 btnConfirm.setBackground(Color.GREEN);
                 btnConfirm.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnConfirm.addMouseListener(new MouseAdapter() {
-                	@Override
-        			public void mouseClicked(MouseEvent click) {
-                        if (txtXcoordinate.getText().isEmpty() || txtYcoordinate.getText().isEmpty() || txtRadiusLength.getText().isEmpty())
-                            JOptionPane.showMessageDialog(getParent(), "Values cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+                btnConfirm.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent click) {
+                        if (txtXcoordinate.getText().isEmpty() || txtYcoordinate.getText().isEmpty() || txtRadiusLength.getText().isEmpty()) JOptionPane.showMessageDialog(getParent(), "Values cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
                         else {
                             try {
-                                if (Integer.parseInt(txtRadiusLength.getText()) <= 0) {
-                                    JOptionPane.showMessageDialog(getParent(), "Radius length must be greater than zero.", "Error", JOptionPane.ERROR_MESSAGE);
-                                    txtRadiusLength.setText("");
-                                } else {
-                                	confirmed = true;
-                                	xCoordinate = Integer.parseInt(txtXcoordinate.getText());
-                                	yCoordinate = Integer.parseInt(txtYcoordinate.getText());
-                                	radiusLength = Integer.parseInt(txtRadiusLength.getText());
-                                	setVisible(false);
-                                	dispose();
+                            	xCoordinate = Integer.parseInt(txtXcoordinate.getText());
+                            	yCoordinate = Integer.parseInt(txtYcoordinate.getText());
+                            	radiusLength = Integer.parseInt(txtRadiusLength.getText());
+                                if (xCoordinate <= 0 || yCoordinate <= 0 || radiusLength <= 0) JOptionPane.showMessageDialog(getParent(), "X and Y coordinates and radius length of hexagon must be positive numbers!", "Error", JOptionPane.ERROR_MESSAGE);
+                                else if (radiusLength + xCoordinate > drawWidth || radiusLength + yCoordinate > drawHeight || yCoordinate - radiusLength <= 0 || xCoordinate - radiusLength < 0) JOptionPane.showMessageDialog(null, "The hexagon goes out of drawing!");
+                        		else {
+                        			confirmed = true;
+                        			setVisible(false);
+                        			dispose();
                                 }
                             } catch (NumberFormatException nfe) {
-                                JOptionPane.showMessageDialog(getParent(), "Coordinates and radius length must be whole numbers!", "Error", JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(getParent(), "X and Y coordinates and radius length of hexagon must be whole numbers!", "Error", JOptionPane.ERROR_MESSAGE);
                             }
                         }
                     }
@@ -231,77 +235,69 @@ public class DlgHexagon extends JDialog {
         }
     }
 
-    /**
-     * @param xOfClick
-     * @param yOfClick
-     */
-    public void write(int xOfClick, int yOfClick) {
+    /** 
+     * {@inheritDoc DlgCircle#write(int, int, int, int)}
+	 */
+    public void write(int xOfClick, int yOfClick, int drawWidth, int drawHeight) {
         txtXcoordinate.setText(String.valueOf(xOfClick));
         txtXcoordinate.setEnabled(false);
         txtYcoordinate.setText(String.valueOf(yOfClick));
         txtYcoordinate.setEnabled(false);
+        this.drawWidth = drawWidth;
+		this.drawHeight = drawHeight;
     }
 
-    /**
-     *
-     */
+	/**
+	 * {@inheritDoc DlgSquare#deleteButtons()}
+	 */
     public void deleteButtons() {
         btnEdgeColor.setVisible(false);
         btnInteriorColor.setVisible(false);
     }
 
-    /**
-     * @param circle
-     */
-    public void fillUp(HexagonAdapter hexagon) {
+	/**
+	 * <h3>Fill up fields with parameters of {@link HexagonAdapter} that user want to update.</h3>
+	 * 
+	 * @param square Represent {@link HexagonAdapter} that user want to update.
+	 */
+    public void fillUp(HexagonAdapter hexagon, int drawWidth, int drawHeight) {
         txtXcoordinate.setText(String.valueOf(hexagon.getXcoordinate()));
         txtYcoordinate.setText(String.valueOf(hexagon.getYcoordinate()));
         txtRadiusLength.setText(String.valueOf(hexagon.getR()));
         edgeColorOfHexagon = hexagon.getColor();
         interiorColorOfHexagon = hexagon.getInteriorColor();
+        if (interiorColorOfHexagon.equals(Color.BLACK)) btnInteriorColor.setForeground(Color.WHITE);
+		else if (interiorColorOfHexagon.equals(Color.WHITE)) btnInteriorColor.setForeground(Color.BLACK);
+		btnEdgeColor.setBackground(edgeColorOfHexagon);
+		btnInteriorColor.setBackground(interiorColorOfHexagon);
+        this.drawWidth = drawWidth;
+		this.drawHeight = drawHeight;
     }
 
     /**
-     * @return
+     * {@inheritDoc DlgSquare#isConfirmed()}
      */
+    public boolean isConfirmed() {
+        return confirmed;
+    }
+    
     public int getXcoordinate() {
         return xCoordinate;
     }
 
-    /**
-     * @return
-     */
     public int getYcoordinate() {
         return yCoordinate;
     }
 
-    /**
-     * @return
-     */
     public int getRadiusLength() {
         return radiusLength;
     }
 
-    /**
-     * @return
-     */
     public Color getEdgeColor() {
-        if (edgeColor == null) return edgeColorOfHexagon;
-        else return edgeColor;
+        return edgeColorOfHexagon;
     }
 
-    /**
-     * @return
-     */
     public Color getInteriorColor() {
-        if (interiorColor == null) return interiorColorOfHexagon;
-        else return interiorColor;
-    }
-
-    /**
-     * @return
-     */
-    public boolean isConfirmed() {
-        return confirmed;
+    	return interiorColorOfHexagon;
     }
 }

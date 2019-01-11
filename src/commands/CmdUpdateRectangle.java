@@ -1,7 +1,6 @@
 package commands;
 
 import javax.swing.DefaultListModel;
-
 import shapes.Rectangle;
 
 /**
@@ -21,7 +20,7 @@ public class CmdUpdateRectangle implements Command {
 		this.newState = newState;
 		this.log = log;
 		originalState = (Rectangle) oldState.clone();
-		command = "Updated rectangle from-> " + oldState.toString() + " to-> " + newState.toString();
+		command = "Updated->" + oldState.toString() + "->" + newState.toString();
 	}
 	
 	/**
@@ -29,7 +28,7 @@ public class CmdUpdateRectangle implements Command {
 	 */
 	@Override
 	public void execute() {
-		oldState.setUpLeft(newState.getUpLeft());
+		oldState.setUpLeft(newState.getUpLeft().clone());
 		oldState.setWidth(newState.getWidth());
 		oldState.setSide(newState.getSide());
 		oldState.setColor(newState.getColor());

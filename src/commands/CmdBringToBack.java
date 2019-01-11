@@ -1,13 +1,10 @@
 package commands;
 
 import javax.swing.DefaultListModel;
-
 import model.DrawingModel;
 import shapes.Shape;
 
 /**
- * @author Vukan Marković
- *
  * Class that represent command to bring some shape to the back.
  */
 public class CmdBringToBack implements Command {
@@ -16,13 +13,11 @@ public class CmdBringToBack implements Command {
 	private DefaultListModel<String> log;
 	private String command;
 	private int index;
-	private String shapeType;
 	
-	public CmdBringToBack(DrawingModel model, Shape shape, DefaultListModel<String> log, String shapeType) {
+	public CmdBringToBack(DrawingModel model, Shape shape, DefaultListModel<String> log) {
 		this.model = model;
 		this.shape = shape;
 		this.log = log;
-		this.shapeType = shapeType;
 	}
 
 	/**
@@ -33,7 +28,7 @@ public class CmdBringToBack implements Command {
 		index =  model.getIndexOfShape(shape);
 		model.removeShapeAtIndex(index);
 		model.addShapeToIndex(0, shape);
-		command = "Bring to back " + shapeType + ": " + shape.toString();
+		command = "Bringed to back->" + shape.toString();
 		log.addElement(command);
 	}
 

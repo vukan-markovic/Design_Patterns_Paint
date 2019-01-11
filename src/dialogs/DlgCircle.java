@@ -12,7 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
@@ -21,12 +20,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-
 import shapes.Circle;
 
 /**
- * 
- * @author Vukan Markovic
+ * Class represent {@link JDialog} for adding or updating {@link Circle}.
  */
 public class DlgCircle extends JDialog {
     private static final long serialVersionUID = 1L;
@@ -40,17 +37,16 @@ public class DlgCircle extends JDialog {
     private int xCoordinateOfCenter;
     private int yCoordinateOfCenter;
     private int radiusLength;
-    private Color edgeColor = Color.BLACK;
-    private Color interiorColor = Color.WHITE;
+    private Color edgeColor;
+    private Color interiorColor;
     private boolean confirmed;
-    private Color edgeColorOfCircle = Color.BLACK;
-    private Color interiorColorOfCircle = Color.WHITE;
+    private Color edgeColorOfCircle;
+    private Color interiorColorOfCircle;
     private JButton btnEdgeColor;
     private JButton btnInteriorColor;
+	private int drawWidth;
+	private int drawHeight;
 
-    /**
-     * @param arrayOfStrings
-     */
     public static void main(String[] arrayOfStrings) {
         try {
             DlgCircle dialog = new DlgCircle();
@@ -60,10 +56,7 @@ public class DlgCircle extends JDialog {
             exception.printStackTrace();
         }
     }
-
-    /**
-     * 
-     */
+    
     public DlgCircle() {
         setModal(true);
         setResizable(false);
@@ -145,20 +138,34 @@ public class DlgCircle extends JDialog {
         btnInteriorColor = new JButton("Choose interior color");
         btnInteriorColor.setFont(new Font("Arial", Font.BOLD, 12));
         btnInteriorColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        btnInteriorColor.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent click) {
+        btnInteriorColor.addMouseListener(new MouseAdapter() {
+        	@Override
+			public void mouseClicked(MouseEvent click) {
                 interiorColor = JColorChooser.showDialog(null, "Color pallete", interiorColorOfCircle);
+                if (interiorColor != null) {
+					interiorColorOfCircle = interiorColor;
+					if (interiorColorOfCircle.equals(Color.BLACK)) btnInteriorColor.setForeground(Color.WHITE);
+					else if (interiorColorOfCircle.equals(Color.WHITE)) btnInteriorColor.setForeground(Color.BLACK);
+					btnInteriorColor.setBackground(interiorColorOfCircle);
+				}
             }
         });
 
         btnEdgeColor = new JButton("Choose edge color");
+        btnEdgeColor.setForeground(Color.WHITE);
         btnEdgeColor.setFont(new Font("Arial", Font.BOLD, 12));
         btnEdgeColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        btnEdgeColor.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent click) {
+        btnEdgeColor.addMouseListener(new MouseAdapter() {
+        	@Override
+			public void mouseClicked(MouseEvent click) {
                 edgeColor = JColorChooser.showDialog(null, "Color pallete", edgeColorOfCircle);
+                if (edgeColor != null) {
+					if (edgeColor.equals(Color.WHITE)) JOptionPane.showMessageDialog(null, "Background is white :D");
+					else {
+						edgeColorOfCircle = edgeColor;
+						btnEdgeColor.setBackground(edgeColorOfCircle);
+					}
+				}
             }
         });
 
@@ -183,26 +190,24 @@ public class DlgCircle extends JDialog {
                 btnConfirm.setFont(new Font("Arial", Font.BOLD, 12));
                 btnConfirm.setBackground(Color.GREEN);
                 btnConfirm.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnConfirm.addMouseListener(new MouseAdapter() {
-                	@Override
-        			public void mouseClicked(MouseEvent click) {
+                btnConfirm.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent click) {
                         if (txtXcoordinateOfCenter.getText().isEmpty() || txtYcoordinateOfCenter.getText().isEmpty() || txtRadiusLength.getText().isEmpty())
                             JOptionPane.showMessageDialog(getParent(), "Values cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
                         else {
                             try {
-                                if (Integer.parseInt(txtRadiusLength.getText()) <= 0) {
-                                    JOptionPane.showMessageDialog(getParent(), "Radius length must be greater than zero.", "Error", JOptionPane.ERROR_MESSAGE);
-                                    txtRadiusLength.setText("");
-                                } else {
-                                	confirmed = true;
-                                	xCoordinateOfCenter = Integer.parseInt(txtXcoordinateOfCenter.getText());
-                                	yCoordinateOfCenter = Integer.parseInt(txtYcoordinateOfCenter.getText());
-                                	radiusLength = Integer.parseInt(txtRadiusLength.getText());
-                                	dispose();
-                                	setVisible(false);
+                            	xCoordinateOfCenter = Integer.parseInt(txtXcoordinateOfCenter.getText());
+                            	yCoordinateOfCenter = Integer.parseInt(txtYcoordinateOfCenter.getText());
+                            	radiusLength = Integer.parseInt(txtRadiusLength.getText());
+                                if (xCoordinateOfCenter <= 0 || yCoordinateOfCenter <= 0 || radiusLength <= 0) JOptionPane.showMessageDialog(getParent(), "X and Y coordinates of center and radius length of circle must be positive numbers!", "Error", JOptionPane.ERROR_MESSAGE);
+                                else if (radiusLength + xCoordinateOfCenter > drawWidth || radiusLength + yCoordinateOfCenter > drawHeight || yCoordinateOfCenter - radiusLength <= 0 || xCoordinateOfCenter - radiusLength < 0) JOptionPane.showMessageDialog(null, "The circle goes out of drawing!");
+                        		else {
+                        			confirmed = true;
+                        			setVisible(false);
+                        			dispose();          
                                 }
                             } catch (NumberFormatException nfe) {
-                                JOptionPane.showMessageDialog(getParent(), "Coordinates of center and radius length must be whole numbers!", "Error", JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(getParent(), "X and Y coordinates of center and radius length of circle must be whole numbers!", "Error", JOptionPane.ERROR_MESSAGE);
                             }
                         }
                     }
@@ -232,76 +237,75 @@ public class DlgCircle extends JDialog {
     }
 
     /**
-     * @param xOfClick
-     * @param yOfClick
-     */
-    public void write(int xOfClick, int yOfClick) {
+	 * <h3>Write appropriate values to fields.</h3>
+	 * 
+	 * Getting width and height of view to not draw out of borders.
+	 * 
+	 * @param xClick Represent x coordinate of clicked place.
+	 * @param yClick Represent y coordinate of clicked place
+	 * @param drawWidth Represent width of draw.
+	 * @param drawHeight Represent height of draw.
+	 */
+    public void write(int xOfClick, int yOfClick, int drawWidth, int drawHeight) {
         txtXcoordinateOfCenter.setText(String.valueOf(xOfClick));
         txtXcoordinateOfCenter.setEnabled(false);
         txtYcoordinateOfCenter.setText(String.valueOf(yOfClick));
         txtYcoordinateOfCenter.setEnabled(false);
+        this.drawWidth = drawWidth;
+		this.drawHeight = drawHeight;
     }
 
-    /**
-     *
-     */
+	/**
+	 * {@inheritDoc DlgSquare#deleteButtons()}
+	 */
     public void deleteButtons() {
         btnEdgeColor.setVisible(false);
         btnInteriorColor.setVisible(false);
     }
 
-    /**
-     * @param circle
-     */
-    public void fillUp(Circle circle) {
+	/**
+	 * <h3>Fill up fields with parameters of {@link Circle} that user want to update.</h3>
+	 * 
+	 * @param square Represent {@link Circle} that user want to update.
+	 */
+    public void fillUp(Circle circle, int drawWidth, int drawHeight) {
         txtXcoordinateOfCenter.setText(String.valueOf(circle.getCenter().getXcoordinate()));
         txtYcoordinateOfCenter.setText(String.valueOf(circle.getCenter().getYcoordinate()));
         txtRadiusLength.setText(String.valueOf(circle.getRadius()));
         edgeColorOfCircle = circle.getColor();
         interiorColorOfCircle = circle.getInteriorColor();
+        if (interiorColorOfCircle.equals(Color.BLACK)) btnInteriorColor.setForeground(Color.WHITE);
+		else if (interiorColorOfCircle.equals(Color.WHITE)) btnInteriorColor.setForeground(Color.BLACK);
+		btnEdgeColor.setBackground(edgeColorOfCircle);
+		btnInteriorColor.setBackground(interiorColorOfCircle);
+        this.drawWidth = drawWidth;
+		this.drawHeight = drawHeight;
     }
 
     /**
-     * @return
+     * {@inheritDoc DlgSquare#isConfirmed()}
      */
+    public boolean isConfirmed() {
+        return confirmed;
+    }
+    
     public int getXcoordinateOfCenter() {
         return xCoordinateOfCenter;
     }
 
-    /**
-     * @return
-     */
     public int getYcoordinateOfCenter() {
         return yCoordinateOfCenter;
     }
 
-    /**
-     * @return
-     */
     public int getRadiusLength() {
         return radiusLength;
     }
 
-    /**
-     * @return
-     */
     public Color getEdgeColor() {
-        if (edgeColor == null) return edgeColorOfCircle;
-        else return edgeColor;
+        return edgeColorOfCircle;
     }
 
-    /**
-     * @return
-     */
     public Color getInteriorColor() {
-    	if (interiorColor == null) return interiorColorOfCircle;
-    	else return interiorColor;
-    }
-
-    /**
-     * @return
-     */
-    public boolean isConfirmed() {
-        return confirmed;
+    	return interiorColorOfCircle;
     }
 }

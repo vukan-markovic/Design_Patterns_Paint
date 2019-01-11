@@ -1,13 +1,10 @@
 package commands;
 
 import javax.swing.DefaultListModel;
-
 import model.DrawingModel;
 import shapes.Shape;
 
 /**
- * @author Vukan Marković
- *
  * Class that represent command to bring some shape to the front.
  */
 public class CmdBringToFront implements Command {
@@ -15,14 +12,14 @@ public class CmdBringToFront implements Command {
 	private Shape shape;
 	private DefaultListModel<String> log;
 	private int index;
+	private int size;
 	private String command;
-	private String shapeType;
 	
-	public CmdBringToFront(DrawingModel model, Shape shape, DefaultListModel<String> log, String shapeType) {
+	public CmdBringToFront(DrawingModel model, Shape shape, DefaultListModel<String> log, int size) {
 		this.model = model;
 		this.shape = shape;
 		this.log = log;
-		this.shapeType = shapeType;
+		this.size = size;
 	}
 
 	/**
@@ -32,8 +29,8 @@ public class CmdBringToFront implements Command {
 	public void execute() {
 		index =  model.getIndexOfShape(shape);
 		model.removeShapeAtIndex(index);
-		model.addShapeToIndex(model.getAll().size() - 1, shape);
-		command = "Bring to front " + shapeType + ": " + shape.toString();
+		model.addShapeToIndex(size, shape);
+		command = "Bringed to front->" + shape.toString();
 		log.addElement(command);
 	}
 

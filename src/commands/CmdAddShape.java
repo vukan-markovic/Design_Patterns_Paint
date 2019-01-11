@@ -1,13 +1,10 @@
 package commands;
 
 import javax.swing.DefaultListModel;
-
 import model.DrawingModel;
 import shapes.Shape;
 
 /**
- * @author Vukan Marković
- *
  * Class that represent command for add new shape to the draw.
  */
 public class CmdAddShape implements Command {
@@ -16,11 +13,11 @@ public class CmdAddShape implements Command {
 	private DefaultListModel<String> log;
 	private String command;
 	
-	public CmdAddShape(Shape shape, DrawingModel model, DefaultListModel<String> log, String shapeType) {
+	public CmdAddShape(Shape shape, DrawingModel model, DefaultListModel<String> log) {
 		this.shape = shape;
 		this.model = model;
 		this.log = log;
-		command = "Added " + shapeType + "-> " + shape.toString();
+		command = "Added->" + shape.toString();
 	}
 	
 	/**

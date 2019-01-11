@@ -1,12 +1,9 @@
 package commands;
 
 import javax.swing.DefaultListModel;
-
 import shapes.Circle;
 
 /**
- * @author Vukan Marković
- *
  * Class that represent command for update existing circle from the draw.
  */
 public class CmdUpdateCircle implements Command {
@@ -21,7 +18,7 @@ public class CmdUpdateCircle implements Command {
 		this.newState = newState;
 		this.log = log;
 		originalState = oldState.clone();
-		command = "Updated circle from-> " + oldState.toString() + " to-> " + newState.toString();
+		command = "Updated->" + oldState.toString() + "->" + newState.toString();
 	}
 	
 	/**
@@ -30,7 +27,7 @@ public class CmdUpdateCircle implements Command {
 	@Override
 	public void execute() {
 		oldState.setRadius(newState.getRadius());
-		oldState.setCenter(newState.getCenter());
+		oldState.setCenter(newState.getCenter().clone());
 		oldState.setInteriorColor(newState.getInteriorColor());
 		oldState.setColor(newState.getColor());
 		log.addElement(command);
@@ -42,7 +39,7 @@ public class CmdUpdateCircle implements Command {
 	@Override
 	public void unexecute() {
 		oldState.setRadius(originalState.getRadius());
-		oldState.setCenter(originalState.getCenter());
+		oldState.setCenter(originalState.getCenter().clone());
 		oldState.setInteriorColor(originalState.getInteriorColor());
 		oldState.setColor(originalState.getColor());
 		log.removeElement(command);

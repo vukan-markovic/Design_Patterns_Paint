@@ -1,12 +1,9 @@
 package commands;
 
 import javax.swing.DefaultListModel;
-
 import shapes.Line;
 
 /**
- * @author Vukan Marković
- *
  * Class that represent command for update existing line from the draw.
  */
 public class CmdUpdateLine implements Command {
@@ -21,7 +18,7 @@ public class CmdUpdateLine implements Command {
 		this.newState = newState;
 		this.log = log;
 		originalState = oldState.clone();
-		command = "Updated line from-> " + oldState.toString() + " to-> " + newState.toString();
+		command = "Updated->" + oldState.toString() + "->" + newState.toString();
 	}
 	
 	/**
@@ -29,8 +26,8 @@ public class CmdUpdateLine implements Command {
 	 */
 	@Override
 	public void execute() {
-		oldState.setInitial(newState.getInitial());
-		oldState.setLast(newState.getLast());
+		oldState.setInitial(newState.getInitial().clone());
+		oldState.setLast(newState.getLast().clone());
 		oldState.setColor(newState.getColor());
 		log.addElement(command);
 	}
