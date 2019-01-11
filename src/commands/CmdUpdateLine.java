@@ -1,6 +1,5 @@
 package commands;
 
-import javax.swing.DefaultListModel;
 import shapes.Line;
 
 /**
@@ -10,15 +9,10 @@ public class CmdUpdateLine implements Command {
 	private Line oldState;
 	private Line newState;
 	private Line originalState;
-	private DefaultListModel<String> log;
-	private String command;
 	
-	public CmdUpdateLine(Line oldState, Line newState, DefaultListModel<String> log) {
+	public CmdUpdateLine(Line oldState, Line newState) {
 		this.oldState = oldState;
 		this.newState = newState;
-		this.log = log;
-		originalState = oldState.clone();
-		command = "Updated->" + oldState.toString() + "->" + newState.toString();
 	}
 	
 	/**
@@ -26,10 +20,10 @@ public class CmdUpdateLine implements Command {
 	 */
 	@Override
 	public void execute() {
+		originalState = oldState.clone();
 		oldState.setInitial(newState.getInitial().clone());
 		oldState.setLast(newState.getLast().clone());
 		oldState.setColor(newState.getColor());
-		log.addElement(command);
 	}
 
 	/**
@@ -40,6 +34,5 @@ public class CmdUpdateLine implements Command {
 		oldState.setInitial(originalState.getInitial());
 		oldState.setLast(originalState.getLast());
 		oldState.setColor(originalState.getColor());
-		log.removeElement(command);
 	}
 }

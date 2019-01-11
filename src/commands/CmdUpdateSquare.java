@@ -1,6 +1,5 @@
 package commands;
 
-import javax.swing.DefaultListModel;
 import shapes.Square;
 
 /**
@@ -10,15 +9,10 @@ public class CmdUpdateSquare implements Command {
 	private Square oldState;
 	private Square newState;
 	private Square originalState;
-	private DefaultListModel<String> log;
-	private String command;
 	
-	public CmdUpdateSquare(Square oldState, Square newState, DefaultListModel<String> log) {
+	public CmdUpdateSquare(Square oldState, Square newState) {
 		this.oldState = oldState;
 		this.newState = newState;
-		this.log = log;
-		originalState = oldState.clone();
-		command = "Updated->" + oldState.toString() + "->" + newState.toString();
 	}
 	
 	/**
@@ -26,11 +20,11 @@ public class CmdUpdateSquare implements Command {
 	 */
 	@Override
 	public void execute() {
+		originalState = oldState.clone();
 		oldState.setUpLeft(newState.getUpLeft().clone());
 		oldState.setSide(newState.getSide());
 		oldState.setColor(newState.getColor());
 		oldState.setInteriorColor(newState.getInteriorColor());
-		log.addElement(command);
 	}
 
 	/**
@@ -42,6 +36,5 @@ public class CmdUpdateSquare implements Command {
 		oldState.setSide(originalState.getSide());
 		oldState.setColor(originalState.getColor());
 		oldState.setInteriorColor(originalState.getInteriorColor());
-		log.removeElement(command);
 	}
 }

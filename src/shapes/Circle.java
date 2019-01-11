@@ -28,8 +28,8 @@ public class Circle extends SurfaceShape {
     public void draw(Graphics g) {
         g.setColor(getColor());
         g.drawOval(center.getXcoordinate() - radius, center.getYcoordinate() - radius, 2 * radius, 2 * radius);
-        if (isSelected())
-            selected(g);
+        fillUpShape(g);
+        if (isSelected()) selected(g);
     }
     
     /**

@@ -7,6 +7,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Stack;
 import javax.swing.DefaultListModel;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
@@ -17,6 +18,7 @@ import commands.CmdAddShape;
 import commands.CmdBringToBack;
 import commands.CmdBringToFront;
 import commands.CmdRemoveShape;
+import commands.CmdSelectShape;
 import commands.CmdToBack;
 import commands.CmdToFront;
 import commands.CmdUpdateCircle;
@@ -35,6 +37,7 @@ import dialogs.DlgSquare;
 import frame.DrawingFrame;
 import hexagon.Hexagon;
 import model.DrawingModel;
+import observer.DrawingObserver;
 import shapes.Circle;
 import shapes.Square;
 import strategy.FileDraw;
@@ -62,9 +65,11 @@ public class DrawingController {
 	private Color choosenInteriorColor;
 	private PropertyChangeSupport propertyChangeSupport;
 	private int counter = 0;
-	private boolean selected;
 	private FileManager fileManager;
 	private DefaultListModel<String> log;
+	private Stack<Command> commands;
+	private Stack<Command> undoCommands;
+	private Stack<String> undoCommandsLog;
 	
 	public DrawingController(DrawingModel model, DrawingFrame frame) {
 		this.model = model;
@@ -72,12 +77,15 @@ public class DrawingController {
 		initialPointOfLine = null;
 		propertyChangeSupport = new PropertyChangeSupport(this);
 		log = frame.getList();
+		commands = new Stack<>();
+		undoCommands = new Stack<>();
+		undoCommandsLog = new Stack<String>();
 	}
 	
 	/**
 	 * <h3>Add listener that will listen (observe) to the changes in this class.</h3>
 	 * 
-	 * @param propertyChangeListener Represent {@link DrawingView} that listen to the changes.
+	 * @param propertyChangeListener Represent {@link DrawingObserver} that listen to the changes.
 	 */
 	public void addPropertyChangedListener(PropertyChangeListener propertyChangeListener) {
 		propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
@@ -124,8 +132,9 @@ public class DrawingController {
 	 * @param click Represent place where user clicked.
 	 */
 	public void btnAddPointClicked(MouseEvent click) {
-		unselect();
-		executeCommand(new CmdAddShape(new Point(click.getX(), click.getY(), edgeColor), model, log));
+		Point point = new Point(click.getX(), click.getY(), edgeColor);
+		executeCommand(new CmdAddShape(point, model));
+		log.addElement("Added->" + point.toString());
 	}
 	
 	/**
@@ -137,10 +146,11 @@ public class DrawingController {
 	 * @param click Represent place where user clicked.
 	 */
 	public void btnAddLineClicked(MouseEvent click) {
-		unselect();
 		if(initialPointOfLine == null) initialPointOfLine = new Point(click.getX(), click.getY(), edgeColor);
 		else {
-			executeCommand(new CmdAddShape(new Line(initialPointOfLine, new Point(click.getX(), click.getY()), edgeColor), model, log));
+			Line line = new Line(initialPointOfLine, new Point(click.getX(), click.getY()), edgeColor);
+			executeCommand(new CmdAddShape(line, model));
+			log.addElement("Added->" + line.toString());
 			initialPointOfLine = null;
 		}
 	}
@@ -154,12 +164,15 @@ public class DrawingController {
 	 * @param click Represent place where user clicked.
 	 */
 	public void btnAddSquareClicked(MouseEvent click) {
-		unselect();
-		DlgSquare square = new DlgSquare();
-		square.write(click.getX(),click.getY(), frame.getView().getWidth(), frame.getView().getHeight());
-		square.deleteButtons();
-		square.setVisible(true);
-		if (square.isConfirmed()) executeCommand(new CmdAddShape(new Square(new Point(click.getX(), click.getY()), square.getSideLength(), edgeColor, interiorColor), model, log));
+		DlgSquare dlgSquare = new DlgSquare();
+		dlgSquare.write(click.getX(),click.getY(), frame.getView().getWidth(), frame.getView().getHeight());
+		dlgSquare.deleteButtons();
+		dlgSquare.setVisible(true);
+		if (dlgSquare.isConfirmed()) {
+			Square square = new Square(new Point(click.getX(), click.getY()), dlgSquare.getSideLength(), edgeColor, interiorColor);
+			executeCommand(new CmdAddShape(square, model));
+			log.addElement("Added->" + square.toString());
+		}
 	}
 	
 	/**
@@ -172,12 +185,15 @@ public class DrawingController {
 	 * @param click Represent place where user clicked.
 	 */
 	public void btnAddRectangleClicked(MouseEvent click) {
-		unselect();
-		DlgRectangle rectangle = new DlgRectangle();
-		rectangle.write(click.getX(), click.getY(), frame.getView().getWidth(), frame.getView().getHeight());
-		rectangle.deleteButtons();
-		rectangle.setVisible(true);
-		if (rectangle.isConfirmed()) executeCommand(new CmdAddShape(new Rectangle(new Point(click.getX(), click.getY()), rectangle.getRectangleWidth(), rectangle.getRectangleHeight(), edgeColor, interiorColor), model, log));
+		DlgRectangle dlgRectangle = new DlgRectangle();
+		dlgRectangle.write(click.getX(), click.getY(), frame.getView().getWidth(), frame.getView().getHeight());
+		dlgRectangle.deleteButtons();
+		dlgRectangle.setVisible(true);
+		if (dlgRectangle.isConfirmed()) {
+			Rectangle rectangle = new Rectangle(new Point(click.getX(), click.getY()), dlgRectangle.getRectangleWidth(), dlgRectangle.getRectangleHeight(), edgeColor, interiorColor);
+			executeCommand(new CmdAddShape(rectangle, model));
+			log.addElement("Added->" + rectangle.toString());
+		}
 	}
 	
 	/**
@@ -190,12 +206,15 @@ public class DrawingController {
 	 * @param click Represent place where user clicked.
 	 */
 	public void btnAddCircleClicked(MouseEvent click) {
-		unselect();
-		DlgCircle circle = new DlgCircle();
-		circle.write(click.getX(), click.getY(), frame.getView().getWidth(), frame.getView().getHeight());
-		circle.deleteButtons();
-		circle.setVisible(true);
-		if (circle.isConfirmed()) executeCommand(new CmdAddShape(new Circle(new Point(click.getX(), click.getY()), circle.getRadiusLength(), edgeColor, interiorColor), model, log));
+		DlgCircle dlgCircle = new DlgCircle();
+		dlgCircle.write(click.getX(), click.getY(), frame.getView().getWidth(), frame.getView().getHeight());
+		dlgCircle.deleteButtons();
+		dlgCircle.setVisible(true);
+		if (dlgCircle.isConfirmed()) {
+			Circle circle = new Circle(new Point(click.getX(), click.getY()), dlgCircle.getRadiusLength(), edgeColor, interiorColor);
+			executeCommand(new CmdAddShape(circle, model));
+			log.addElement("Added->" + circle.toString());
+		}
 	}
 	
 	/**
@@ -207,7 +226,6 @@ public class DrawingController {
 	 * @param click Represent place where user clicked.
 	 */
 	public void btnAddHexagonClicked(MouseEvent click) {
-		unselect();
 		DlgHexagon dlgHexagon = new DlgHexagon();
 		dlgHexagon.write(click.getX(), click.getY(), frame.getView().getWidth(), frame.getView().getHeight());
 		dlgHexagon.deleteButtons();
@@ -216,7 +234,9 @@ public class DrawingController {
 			Hexagon hexagon = new Hexagon(click.getX(), click.getY(), dlgHexagon.getRadiusLength());
 			hexagon.setBorderColor(edgeColor);
 			hexagon.setAreaColor(interiorColor);
-			executeCommand(new CmdAddShape(new HexagonAdapter(hexagon), model, log));
+			HexagonAdapter hexagonAdapter = new HexagonAdapter(hexagon);
+			executeCommand(new CmdAddShape(hexagonAdapter, model));
+			log.addElement("Added->" + hexagonAdapter.toString());
 		}
 	}
 
@@ -244,13 +264,19 @@ public class DrawingController {
 
 			if (!shape.isSelected()) {
 				++counter;
-				shape.setSelected(true);
+				executeCommand(new CmdSelectShape(shape, true));
+				frame.getList().addElement("Selected->" + shape.toString());
 			}
 			else {
 				--counter;
-				shape.setSelected(false);
+				executeCommand(new CmdSelectShape(shape, false));
+				frame.getList().addElement("Unselected->" + shape.toString());
 			}
-			selected = true;
+			
+			if (counter == 0)  {
+				propertyChangeSupport.firePropertyChange("shape unselected", false, true);
+				propertyChangeSupport.firePropertyChange("change position turn off", false, true);
+			}  
 			
 			if (counter == 1)  {
 				propertyChangeSupport.firePropertyChange("update turn on", false, true);
@@ -278,27 +304,22 @@ public class DrawingController {
 			}
 		}
 		
-		if (!selected) unselect();
-		else selected = false;
 		frame.getView().repaint();	
 	}
 	
 	/**
-	 * <h3>Method is called when some shape(s) need to be unselected.</h3>
-	 */
-	public void unselect() {
-		Iterator<Shape> shapesIterator = model.getAll().iterator();
-		propertyChangeSupport.firePropertyChange("shape unselected", false, true);
-		propertyChangeSupport.firePropertyChange("change position turn off", false, true);
-		
-		while(shapesIterator.hasNext()) {
-			Shape shapeForSelection = shapesIterator.next();
-			if(shapeForSelection.isSelected()) {
-				shapeForSelection.setSelected(false);
-			}
-		}
-		
-		counter = 0;
+	 * <h3>Method that is called when user choose to update some shape.</h3>
+	 * 
+	 * Determines instance of selected shape and call appropriate method forwarding casted type of shape.
+	 */ 
+	public void updateShapeClicked() {
+		Shape shape = getSelectedShape();
+		if (shape instanceof Point) btnUpdatePointClicked((Point) shape);
+		else if (shape instanceof Line) btnUpdateLineClicked((Line) shape);
+		else if (shape instanceof Rectangle) btnUpdateRectangleClicked((Rectangle) shape);
+		else if (shape instanceof Square) btnUpdateSquareClicked((Square) shape);
+		else if (shape instanceof Circle) btnUpdateCircleClicked((Circle) shape);
+		else btnUpdateHexagonClicked((HexagonAdapter) shape);
 	}
 
 	/**
@@ -309,11 +330,15 @@ public class DrawingController {
 	 * </p>
 	 * @param point Point that user want to update.
 	 */
-	public void btnUpdatePointClicked(Point point) {
+	public void btnUpdatePointClicked(Point oldPoint) {
 		DlgPoint dlgPoint = new DlgPoint();
-		dlgPoint.write(point, frame.getView().getWidth(), frame.getView().getHeight());
+		dlgPoint.write(oldPoint, frame.getView().getWidth(), frame.getView().getHeight());
 		dlgPoint.setVisible(true);
-		if(dlgPoint.isConfirmed()) executeCommand(new CmdUpdatePoint(point, new Point(dlgPoint.getXcoordinate(), dlgPoint.getYcoordinate(), dlgPoint.getColor()), log));
+		if(dlgPoint.isConfirmed()) {
+			Point newPoint = new Point(dlgPoint.getXcoordinate(), dlgPoint.getYcoordinate(), dlgPoint.getColor());
+			executeCommand(new CmdUpdatePoint(oldPoint, newPoint));
+			log.addElement("Updated->" + oldPoint.toString() + "->" + newPoint.toString());
+		}
 	}
 	
 	/**
@@ -324,11 +349,15 @@ public class DrawingController {
 	 * </p>
 	 * @param line Line that user want to update.
 	 */
-	public void btnUpdateLineClicked(Line line) {
+	public void btnUpdateLineClicked(Line oldLine) {
 		DlgLine dlgLine = new DlgLine();
-		dlgLine.write(line);
+		dlgLine.write(oldLine);
 		dlgLine.setVisible(true);
-		if(dlgLine.isConfirmed()) executeCommand(new CmdUpdateLine(line, new Line(new Point(dlgLine.getXcoordinateInitial(), dlgLine.getYcoordinateInitial()), new Point(dlgLine.getXcoordinateLast(), dlgLine.getYcoordinateLast()), dlgLine.getColor()), log));
+		if(dlgLine.isConfirmed()) {
+			Line newLine =  new Line(new Point(dlgLine.getXcoordinateInitial(), dlgLine.getYcoordinateInitial()), new Point(dlgLine.getXcoordinateLast(), dlgLine.getYcoordinateLast()), dlgLine.getColor());
+			executeCommand(new CmdUpdateLine(oldLine, newLine));
+			log.addElement("Updated->" + oldLine.toString() + "->" + newLine.toString());
+		}
 	}
 	
 	/**
@@ -339,11 +368,15 @@ public class DrawingController {
 	 * </p>
 	 * @param rectangle Rectangle that user want to update.
 	 */
-	public void btnUpdateRectangleClicked(Rectangle rectangle) {
+	public void btnUpdateRectangleClicked(Rectangle oldRectangle) {
 		DlgRectangle dlgRectangle = new DlgRectangle();
-		dlgRectangle.fillUp(rectangle, frame.getView().getWidth(), frame.getView().getHeight());
+		dlgRectangle.fillUp(oldRectangle, frame.getView().getWidth(), frame.getView().getHeight());
 		dlgRectangle.setVisible(true);
-		if(dlgRectangle.isConfirmed()) executeCommand(new CmdUpdateRectangle(rectangle, new Rectangle(new Point(dlgRectangle.getXcoordinate(), dlgRectangle.getYcoordinate()), dlgRectangle.getRectangleWidth(), dlgRectangle.getRectangleHeight(), dlgRectangle.getEdgeColor(), dlgRectangle.getInteriorColor()), log));
+		if(dlgRectangle.isConfirmed()) {
+			Rectangle newRectangle = new Rectangle(new Point(dlgRectangle.getXcoordinate(), dlgRectangle.getYcoordinate()), dlgRectangle.getRectangleWidth(), dlgRectangle.getRectangleHeight(), dlgRectangle.getEdgeColor(), dlgRectangle.getInteriorColor());
+			executeCommand(new CmdUpdateRectangle(oldRectangle, newRectangle));
+			log.addElement("Updated->" + oldRectangle.toString() + "->" + newRectangle.toString());
+		}
 	}
 
 	/**
@@ -354,11 +387,15 @@ public class DrawingController {
 	 * </p>
 	 * @param square Square that user want to update.
 	 */
-	public void btnUpdateSquareClicked(Square square) {
+	public void btnUpdateSquareClicked(Square oldSquare) {
 		DlgSquare dlgSquare = new DlgSquare();
-		dlgSquare.fillUp(square, frame.getView().getWidth(), frame.getView().getHeight());
+		dlgSquare.fillUp(oldSquare, frame.getView().getWidth(), frame.getView().getHeight());
 		dlgSquare.setVisible(true);
-		if(dlgSquare.isConfirmed()) executeCommand(new CmdUpdateSquare(square, new Square(new Point(dlgSquare.getXcoordinate(), dlgSquare.getYcoordinate()), dlgSquare.getSideLength(), dlgSquare.getEdgeColor(), dlgSquare.getInteriorColor()), log));
+		if(dlgSquare.isConfirmed()) {
+			Square newSquare = new Square(new Point(dlgSquare.getXcoordinate(), dlgSquare.getYcoordinate()), dlgSquare.getSideLength(), dlgSquare.getEdgeColor(), dlgSquare.getInteriorColor());
+			executeCommand(new CmdUpdateSquare(oldSquare, newSquare));
+			log.addElement("Updated->" + oldSquare.toString() + "->" + newSquare.toString());
+		}
 	}
 	
 	/**
@@ -369,11 +406,15 @@ public class DrawingController {
 	 * </p>
 	 * @param circle Circle that user want to update.
 	 */
-	public void btnUpdateCircleClicked(Circle circle) {
+	public void btnUpdateCircleClicked(Circle oldCircle) {
 		DlgCircle dlgCircle = new DlgCircle();
-		dlgCircle.fillUp(circle, frame.getView().getWidth(), frame.getView().getHeight());
+		dlgCircle.fillUp(oldCircle, frame.getView().getWidth(), frame.getView().getHeight());
 		dlgCircle.setVisible(true);
-		if(dlgCircle.isConfirmed()) executeCommand(new CmdUpdateCircle(circle, new Circle(new Point(dlgCircle.getXcoordinateOfCenter(), dlgCircle.getYcoordinateOfCenter()), dlgCircle.getRadiusLength(), dlgCircle.getEdgeColor(), dlgCircle.getInteriorColor()), log));
+		if(dlgCircle.isConfirmed()) {
+			Circle newCircle = new Circle(new Point(dlgCircle.getXcoordinateOfCenter(), dlgCircle.getYcoordinateOfCenter()), dlgCircle.getRadiusLength(), dlgCircle.getEdgeColor(), dlgCircle.getInteriorColor());
+			executeCommand(new CmdUpdateCircle(oldCircle, newCircle));
+			log.addElement("Updated->" + oldCircle.toString() + "->" + newCircle.toString());
+		}
 	}
 	
 	/**
@@ -384,16 +425,90 @@ public class DrawingController {
 	 * </p>
 	 * @param hexagon Hexagon that user want to update.
 	 */
-	public void btnUpdateHexagonClicked(HexagonAdapter hexagon) {
+	public void btnUpdateHexagonClicked(HexagonAdapter oldHexagon) {
 		DlgHexagon dlgHexagon = new DlgHexagon();
-		dlgHexagon.fillUp(hexagon, frame.getView().getWidth(), frame.getView().getHeight());
+		dlgHexagon.fillUp(oldHexagon, frame.getView().getWidth(), frame.getView().getHeight());
 		dlgHexagon.setVisible(true);
 		if (dlgHexagon.isConfirmed()) {
 			Hexagon hex = new Hexagon(dlgHexagon.getXcoordinate(), dlgHexagon.getYcoordinate(), dlgHexagon.getRadiusLength());
 			hex.setAreaColor(dlgHexagon.getInteriorColor());
 			hex.setBorderColor(dlgHexagon.getEdgeColor());
-			executeCommand(new CmdUpdateHexagon(hexagon, new HexagonAdapter(hex), log));
+			HexagonAdapter newHexagon = new HexagonAdapter(hex);
+			executeCommand(new CmdUpdateHexagon(oldHexagon, newHexagon));
+			log.addElement("Updated->" + oldHexagon.toString() + "->" + newHexagon.toString());
 		}		
+	}
+	
+	/**
+	 * <h3>Method that call command {@link CmdToFront} which move some shape one position forward in the list of shapes if shape is not already at last position.</h3>
+	 */ 
+	public void toFront() {
+		Shape shape = getSelectedShape();
+		if (model.getIndexOfShape(shape) == model.getAll().size() - 1) JOptionPane.showMessageDialog(null, "Shape is already on top!");
+		else {
+			if (model.getIndexOfShape(shape) == model.getAll().size() - 2) {
+				propertyChangeSupport.firePropertyChange("to front turn off", false, true);
+				propertyChangeSupport.firePropertyChange("bring to front turn off", false, true);
+			}
+			else if (model.getIndexOfShape(shape) == 0) {
+				propertyChangeSupport.firePropertyChange("to back turn on", false, true);
+				propertyChangeSupport.firePropertyChange("bring to back turn on", false, true);
+			}
+			executeCommand(new CmdToFront(model, shape));
+			log.addElement("Moved to front->" + shape.toString());
+		}
+	}
+
+	/**
+	 * <h3>Method that call command {@link CmdBringToFront} which bring some shape at the end of the list of shapes if shape is not already at last position.</h3>
+	 */ 
+	public void bringToFront() {
+		Shape shape = getSelectedShape();
+		if (model.getIndexOfShape(shape) == model.getAll().size() - 1) JOptionPane.showMessageDialog(null, "Shape is already on top!");
+		else {
+			propertyChangeSupport.firePropertyChange("to front turn off", false, true);
+			propertyChangeSupport.firePropertyChange("bring to front turn off", false, true);
+			propertyChangeSupport.firePropertyChange("to back turn on", false, true);
+			propertyChangeSupport.firePropertyChange("bring to back turn on", false, true);
+			executeCommand(new CmdBringToFront(model, shape, model.getAll().size() - 1));
+			log.addElement("Bringed to front->" + shape.toString());
+		}
+	}
+
+	/**
+	 * <h3>Method that call command {@link CmdToBack} which move some shape one position backward in the list of shapes if shape is not already at first position.</h3>
+	 */ 
+	public void toBack() {
+		Shape shape = getSelectedShape();
+		if (model.getIndexOfShape(shape) == 0) JOptionPane.showMessageDialog(null, "Shape is already on bottom!");
+		else {
+			if (model.getIndexOfShape(shape) == 1) {
+				propertyChangeSupport.firePropertyChange("to back turn off", false, true);
+				propertyChangeSupport.firePropertyChange("bring to back turn off", false, true);
+			}
+			else if (model.getIndexOfShape(shape) == model.getAll().size() - 1) {
+				propertyChangeSupport.firePropertyChange("to front turn on", false, true);
+				propertyChangeSupport.firePropertyChange("bring to front turn on", false, true);
+			}
+			executeCommand(new CmdToBack(model, shape));
+			log.addElement("Moved to back->" + shape.toString());
+		}
+	}
+
+	/**
+	 * <h3>Method that call command {@link CmdBringToBack} which bring some shape at the beginnig of the list of shapes if shape is not already at first position.</h3>
+	 */ 
+	public void bringToBack() {
+		Shape shape = getSelectedShape();
+		if (model.getIndexOfShape(shape) == 0) JOptionPane.showMessageDialog(null, "Shape is already on bottom!");
+		else {
+			propertyChangeSupport.firePropertyChange("to back turn off", false, true);
+			propertyChangeSupport.firePropertyChange("bring to back turn off", false, true);
+			propertyChangeSupport.firePropertyChange("to front turn on", false, true);
+			propertyChangeSupport.firePropertyChange("bring to front turn on", false, true);
+			executeCommand(new CmdBringToBack(model, shape));
+			log.addElement("Bringed to back->" + shape.toString());
+		}
 	}
 	
 	/**
@@ -422,10 +537,13 @@ public class DrawingController {
 			
 			while (it.hasNext()) {
 				Shape shape = it.next();
-				if(shape.isSelected()) shapesForDeletion.add(shape);
+				if(shape.isSelected()) {
+					shapesForDeletion.add(shape);
+					log.addElement("Deleted->" + shape.toString());
+				}
 			}
 			
-			executeCommand(new CmdRemoveShape(shapesForDeletion, model, log));
+			executeCommand(new CmdRemoveShape(shapesForDeletion, model));
 		}
 	}
 	
@@ -438,18 +556,18 @@ public class DrawingController {
 	 */
 	public void executeCommand(Command command) {
 		command.execute();
-		model.addCommand(command);
+		commands.push(command);
 	
-		if (!model.getUndoCommands().isEmpty()) {
-			model.getUndoCommands().removeAllElements();
+		if (!undoCommands.isEmpty()) {
+			undoCommands.removeAllElements();
 			propertyChangeSupport.firePropertyChange("redo turn off", false, true);
 		}
 		
 		if (model.getAll().isEmpty()) propertyChangeSupport.firePropertyChange("shape don't exist", false, true);
 		else if (model.getAll().size() == 1 && (command instanceof CmdAddShape || command instanceof CmdRemoveShape)) propertyChangeSupport.firePropertyChange("shape exist", false, true);
 		
-		if (model.getCommands().size() == 1) propertyChangeSupport.firePropertyChange("draw is not empty", false, true);
-		if (model.getCommands().isEmpty()) propertyChangeSupport.firePropertyChange("draw is empty", false, true);
+		if (commands.size() == 1) propertyChangeSupport.firePropertyChange("draw is not empty", false, true);
+		if (commands.isEmpty()) propertyChangeSupport.firePropertyChange("draw is empty", false, true);
 		frame.getView().repaint();
 	}
 	
@@ -461,11 +579,12 @@ public class DrawingController {
 	 * @param command Command that need to be unexecuted.
 	 */
 	public void undo() {
-		model.getLastCommand().unexecute();
-		model.addUndoCommand(model.removeCommand());
+		commands.peek().unexecute();
+		undoCommandsLog.add(log.remove(log.size() - 1));
+		undoCommands.push(commands.pop());
 		if (frame.getList().isEmpty()) propertyChangeSupport.firePropertyChange("log turn off", false, true);
-		if (model.getUndoCommands().size() == 1) propertyChangeSupport.firePropertyChange("redo turn on", false, true);
-		if (model.getCommands().isEmpty()) propertyChangeSupport.firePropertyChange("draw is empty", false, true);
+		if (undoCommands.size() == 1) propertyChangeSupport.firePropertyChange("redo turn on", false, true);
+		if (commands.isEmpty()) propertyChangeSupport.firePropertyChange("draw is empty", false, true);
 		frame.getView().repaint();
 	}
 	
@@ -477,10 +596,11 @@ public class DrawingController {
 	 * @param command Command that need to be executed again.
 	 */
 	public void redo() {		
-		model.getLastUndoCommand().execute();
-		model.addCommand((model.removeUndoCommand()));
-		if (model.getUndoCommands().isEmpty()) propertyChangeSupport.firePropertyChange("redo turn off", false, true);
-		if (model.getCommands().size() == 1) {
+		undoCommands.peek().execute();
+		log.addElement(undoCommandsLog.pop());
+		commands.push((undoCommands.pop()));
+		if (undoCommands.isEmpty()) propertyChangeSupport.firePropertyChange("redo turn off", false, true);
+		if (commands.size() == 1) {
 			propertyChangeSupport.firePropertyChange("shape exist", false, true);
 			propertyChangeSupport.firePropertyChange("draw is not empty", false, true);
 			propertyChangeSupport.firePropertyChange("log turn on", false, true);
@@ -507,7 +627,7 @@ public class DrawingController {
 			chooser.setFileFilter(new FileNameExtensionFilter("Serialized draw", "ser"));
 			chooser.setFileFilter(new FileNameExtensionFilter("Picture", "jpeg"));
 		}
-		if (!model.getCommands().isEmpty()) chooser.setFileFilter(new FileNameExtensionFilter("Commands log", "log"));
+		if (!commands.isEmpty()) chooser.setFileFilter(new FileNameExtensionFilter("Commands log", "log"));
 		if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
 			if (chooser.getFileFilter().getDescription().equals("Serialized draw")) fileManager = new FileManager(new FileDraw(model));
 			else if (chooser.getFileFilter().getDescription().equals("Commands log")) fileManager = new FileManager(new FileLog(frame, model, this));
@@ -536,10 +656,12 @@ public class DrawingController {
 		chooser.setFileFilter(new FileNameExtensionFilter("Commands log", "log"));
 		if(chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 			model.removeAll();
-			if (chooser.getFileFilter().getDescription().equals("Serialized draw")) {
-				fileManager = new FileManager(new FileDraw(model));
-				frame.getView().repaint();
-			}
+			frame.getList().removeAllElements();
+			undoCommands.clear();
+			undoCommandsLog.clear();
+			commands.clear();
+			frame.getView().repaint();
+			if (chooser.getFileFilter().getDescription().equals("Serialized draw")) fileManager = new FileManager(new FileDraw(model));
 			else if (chooser.getFileFilter().getDescription().equals("Commands log")) fileManager = new FileManager(new FileLog(frame, model, this));
 			fileManager.open(chooser.getSelectedFile());
 			propertyChangeSupport.firePropertyChange("draw is loaded", false, true);
@@ -554,91 +676,11 @@ public class DrawingController {
 		if(JOptionPane.showConfirmDialog(null, "Are you sure that you want to start new draw?", "Warning!", JOptionPane.YES_NO_OPTION) == 0) {	
 			model.removeAll();
 			frame.getList().removeAllElements();
+			undoCommands.clear();
+			undoCommandsLog.clear();
+			commands.clear();
 			propertyChangeSupport.firePropertyChange("draw is empty", false, true);
 			frame.getView().repaint();
 		}
-	}
-
-	/**
-	 * <h3>Method that call command {@link CmdToFront} which move some shape one position forward in the list of shapes if shape is not already at last position.</h3>
-	 */ 
-	public void toFront() {
-		Shape shape = getSelectedShape();
-		if (model.getIndexOfShape(shape) == model.getAll().size() - 1) JOptionPane.showMessageDialog(null, "Shape is already on top!");
-		else {
-			if (model.getIndexOfShape(shape) == model.getAll().size() - 2) {
-				propertyChangeSupport.firePropertyChange("to front turn off", false, true);
-				propertyChangeSupport.firePropertyChange("bring to front turn off", false, true);
-			}
-			else if (model.getIndexOfShape(shape) == 0) {
-				propertyChangeSupport.firePropertyChange("to back turn on", false, true);
-				propertyChangeSupport.firePropertyChange("bring to back turn on", false, true);
-			}
-			executeCommand(new CmdToFront(model, shape, log));
-		}
-	}
-
-	/**
-	 * <h3>Method that call command {@link CmdBringToFront} which bring some shape at the end of the list of shapes if shape is not already at last position.</h3>
-	 */ 
-	public void bringToFront() {
-		Shape shape = getSelectedShape();
-		if (model.getIndexOfShape(shape) == model.getAll().size() - 1) JOptionPane.showMessageDialog(null, "Shape is already on top!");
-		else {
-			propertyChangeSupport.firePropertyChange("to front turn off", false, true);
-			propertyChangeSupport.firePropertyChange("bring to front turn off", false, true);
-			propertyChangeSupport.firePropertyChange("to back turn on", false, true);
-			propertyChangeSupport.firePropertyChange("bring to back turn on", false, true);
-			executeCommand(new CmdBringToFront(model, shape, log, model.getAll().size() - 1));
-		}
-	}
-
-	/**
-	 * <h3>Method that call command {@link CmdToBack} which move some shape one position backward in the list of shapes if shape is not already at first position.</h3>
-	 */ 
-	public void toBack() {
-		Shape shape = getSelectedShape();
-		if (model.getIndexOfShape(shape) == 0) JOptionPane.showMessageDialog(null, "Shape is already on bottom!");
-		else {
-			if (model.getIndexOfShape(shape) == 1) {
-				propertyChangeSupport.firePropertyChange("to back turn off", false, true);
-				propertyChangeSupport.firePropertyChange("bring to back turn off", false, true);
-			}
-			else if (model.getIndexOfShape(shape) == model.getAll().size() - 1) {
-				propertyChangeSupport.firePropertyChange("to front turn on", false, true);
-				propertyChangeSupport.firePropertyChange("bring to front turn on", false, true);
-			}
-			executeCommand(new CmdToBack(model, shape, log));
-		}
-	}
-
-	/**
-	 * <h3>Method that call command {@link CmdBringToBack} which bring some shape at the beginnig of the list of shapes if shape is not already at first position.</h3>
-	 */ 
-	public void bringToBack() {
-		Shape shape = getSelectedShape();
-		if (model.getIndexOfShape(shape) == 0) JOptionPane.showMessageDialog(null, "Shape is already on bottom!");
-		else {
-			propertyChangeSupport.firePropertyChange("to back turn off", false, true);
-			propertyChangeSupport.firePropertyChange("bring to back turn off", false, true);
-			propertyChangeSupport.firePropertyChange("to front turn on", false, true);
-			propertyChangeSupport.firePropertyChange("bring to front turn on", false, true);
-			executeCommand(new CmdBringToBack(model, shape, log));
-		}
-	}
-	
-	/**
-	 * <h3>Method that is called when user choose to update some shape.</h3>
-	 * 
-	 * Determines instance of selected shape and call appropriate method forwarding casted type of shape.
-	 */ 
-	public void updateShapeClicked() {
-		Shape shape = getSelectedShape();
-		if (shape instanceof Point) btnUpdatePointClicked((Point) shape);
-		else if (shape instanceof Line) btnUpdateLineClicked((Line) shape);
-		else if (shape instanceof Rectangle) btnUpdateRectangleClicked((Rectangle) shape);
-		else if (shape instanceof Square) btnUpdateSquareClicked((Square) shape);
-		else if (shape instanceof Circle) btnUpdateCircleClicked((Circle) shape);
-		else btnUpdateHexagonClicked((HexagonAdapter) shape);
 	}
 }

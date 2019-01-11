@@ -4,20 +4,16 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import controller.DrawingController;
-import model.DrawingModel;
+import observer.DrawingObserver;
 import view.DrawingView;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import javax.swing.border.SoftBevelBorder;
-import javax.swing.border.BevelBorder;
 
 /**
  * @author Vukan Markovic
  * @version 1.0
  * @since 11.01.2019.
  */
-public class DrawingFrame extends JFrame implements PropertyChangeListener {
+public class DrawingFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel mainPanel;
 	private final ButtonGroup buttonsGroup;
@@ -36,7 +32,6 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 	private JButton btnNewDraw;
 	private JButton btnSaveDraw;
 	private JButton btnLog;
-	private JLabel mouseCoordinates;
 	private MouseAdapter mouseAdapterUpdate;
 	private MouseAdapter mouseAdapterDelete;
 	private MouseAdapter mouseAdapterUndo;
@@ -65,7 +60,7 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 		setLocationRelativeTo(null);
 		
 		mainPanel = new JPanel();
-		mainPanel.setBackground(Color.BLUE);
+		mainPanel.setBackground(Color.GRAY);
 		mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		mainPanel.setLayout(new BorderLayout(0, 0));
 		setContentPane(mainPanel);
@@ -73,9 +68,9 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 		scrollPane = new JScrollPane();
 
 		JPanel buttonsPanelForDrawing = new JPanel();
-		buttonsPanelForDrawing.setBackground(Color.CYAN);
+		buttonsPanelForDrawing.setBackground(Color.GRAY);
 		JPanel buttonsPanel = new JPanel();
-		buttonsPanel.setBackground(Color.CYAN);
+		buttonsPanel.setBackground(Color.GRAY);
 
 		view = new DrawingView();
 		view.setBackground(Color.WHITE);
@@ -85,126 +80,95 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 		buttonsGroup = new ButtonGroup();
 
 		JToggleButton tglBtnDrawPoint = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/point.png")));
-		tglBtnDrawPoint.setHorizontalTextPosition(SwingConstants.RIGHT);
-		tglBtnDrawPoint.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		tglBtnDrawPoint.setFont(new Font("Dotum", Font.BOLD, 12));
 		tglBtnDrawPoint.setText("Point");
 		tglBtnDrawPoint.setSelected(true);
-		tglBtnDrawPoint.setBackground(Color.GREEN);
 		buttonsGroup.add(tglBtnDrawPoint);
 		tglBtnDrawPoint.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawPoint.getX(), tglBtnDrawPoint.getY()), "img"));
 		buttonsPanelForDrawing.add(tglBtnDrawPoint);
 
 		JToggleButton tglBtnDrawSquare = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/square.png")));
-		tglBtnDrawSquare.setHorizontalTextPosition(SwingConstants.RIGHT);
-		tglBtnDrawSquare.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		tglBtnDrawSquare.setFont(new Font("Dotum", Font.BOLD, 12));
 		tglBtnDrawSquare.setText("Square");
-		tglBtnDrawSquare.setBackground(Color.ORANGE);
 		buttonsGroup.add(tglBtnDrawSquare);
 		tglBtnDrawSquare.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanelForDrawing.add(tglBtnDrawSquare);
 
 		JToggleButton tglBtnDrawRectangle = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/rectangle.png")));
-		tglBtnDrawRectangle.setHorizontalTextPosition(SwingConstants.RIGHT);
-		tglBtnDrawRectangle.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		tglBtnDrawRectangle.setFont(new Font("Dotum", Font.BOLD, 12));
 		tglBtnDrawRectangle.setText("Rectangle");
-		tglBtnDrawRectangle.setBackground(Color.PINK);
 		buttonsGroup.add(tglBtnDrawRectangle);
 		tglBtnDrawRectangle.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanelForDrawing.add(tglBtnDrawRectangle);
 
 		JToggleButton tglBtnDrawLine = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/line.png")));
-		tglBtnDrawLine.setHorizontalTextPosition(SwingConstants.RIGHT);
-		tglBtnDrawLine.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		tglBtnDrawLine.setFont(new Font("Dotum", Font.BOLD, 12));
 		tglBtnDrawLine.setText("Line");
-		tglBtnDrawLine.setBackground(new Color(153, 50, 204));
 		buttonsGroup.add(tglBtnDrawLine);
 		tglBtnDrawLine.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanelForDrawing.add(tglBtnDrawLine);
 
 		JToggleButton tglBtnDrawCircle = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/circle.png")));
-		tglBtnDrawCircle.setHorizontalTextPosition(SwingConstants.RIGHT);
-		tglBtnDrawCircle.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		tglBtnDrawCircle.setFont(new Font("Dotum", Font.BOLD, 12));
 		tglBtnDrawCircle.setText("Circle");
-		tglBtnDrawCircle.setBackground(Color.RED);
 		buttonsGroup.add(tglBtnDrawCircle);
 		tglBtnDrawCircle.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanelForDrawing.add(tglBtnDrawCircle);
 		
 		JToggleButton tglBtnDrawHexagon = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/hexagon.png")));
-		tglBtnDrawHexagon.setHorizontalTextPosition(SwingConstants.RIGHT);
-		tglBtnDrawHexagon.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		tglBtnDrawHexagon.setFont(new Font("Dotum", Font.BOLD, 12));
 		tglBtnDrawHexagon.setText("Hexagon");
-		tglBtnDrawHexagon.setBackground(Color.MAGENTA);
 		buttonsGroup.add(tglBtnDrawHexagon);
 		tglBtnDrawHexagon.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanelForDrawing.add(tglBtnDrawHexagon);
 		
 		btnSaveDraw = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/save.png")));
-		btnSaveDraw.setHorizontalTextPosition(SwingConstants.RIGHT);
-		btnSaveDraw.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		btnSaveDraw.setEnabled(false);
-		btnSaveDraw.setBackground(new Color(255, 222, 173));
 		btnSaveDraw.setText("Save");
 		btnSaveDraw.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanelForDrawing.add(btnSaveDraw);
 		
 		btnNewDraw = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/new.png")));
 		btnNewDraw.setText("New draw");
-		btnNewDraw.setHorizontalTextPosition(SwingConstants.RIGHT);
-		btnNewDraw.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		btnNewDraw.setEnabled(false);
-		btnNewDraw.setBackground(new Color(222, 184, 135));
 		btnNewDraw.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		btnNewDraw.setEnabled(false);
 		buttonsPanelForDrawing.add(btnNewDraw);
 		
 		JButton btnOpenDraw = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/open.png")));
 		btnOpenDraw.setText("Open");
-		btnOpenDraw.setHorizontalTextPosition(SwingConstants.RIGHT);
-		btnOpenDraw.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		btnOpenDraw.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanelForDrawing.add(btnOpenDraw);
-		mouseCoordinates = new JLabel("X:0, Y:0");
-		buttonsPanelForDrawing.add(mouseCoordinates);
 		
 		btnLog = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/log.png")));
 		btnLog.setEnabled(false);
 		btnLog.setText("Log");
 		btnLog.setFont(new Font("Lucida Console", Font.BOLD, 12));
-		btnLog.setBackground(Color.ORANGE);
 		btnLog.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
-		buttonsPanel.add(btnLog);
+		buttonsPanelForDrawing.add(btnLog);
 
 		tglBtnSelect = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/select.png")));
-		tglBtnSelect.setBackground(Color.YELLOW);
+		tglBtnSelect.setText("Select");
 		tglBtnSelect.setEnabled(false);
 		buttonsGroup.add(tglBtnSelect);
 		tglBtnSelect.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanel.add(tglBtnSelect);
 
 		btnUpdate = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/update.png")));
-		btnUpdate.setBackground(Color.MAGENTA);
+		btnUpdate.setText("Update");
 		btnUpdate.setEnabled(false);
 		buttonsGroup.add(btnUpdate);
 		btnUpdate.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanel.add(btnUpdate);
 
 		btnDelete = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/delete.png")));
-		btnDelete.setBackground(Color.DARK_GRAY);
+		btnDelete.setText("Delete");
 		btnDelete.setEnabled(false);
 		buttonsGroup.add(btnDelete);
 		btnDelete.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanel.add(btnDelete);
 
 		JButton btnEdgeColor = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/picker.png")));
-		btnEdgeColor.setHorizontalTextPosition(SwingConstants.RIGHT);
-		btnEdgeColor.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		btnEdgeColor.setForeground(Color.WHITE);
 		btnEdgeColor.setText("Edge color");
 		btnEdgeColor.setBackground(Color.BLACK);
@@ -212,8 +176,6 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 		buttonsPanel.add(btnEdgeColor);
 
 		JButton btnInteriorColor = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/color-picker.png")));
-		btnInteriorColor.setHorizontalTextPosition(SwingConstants.RIGHT);
-		btnInteriorColor.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		btnInteriorColor.setText("Area color");
 		btnInteriorColor.setForeground(Color.BLACK);
 		btnInteriorColor.setBackground(Color.WHITE);
@@ -221,53 +183,46 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 		buttonsPanel.add(btnInteriorColor);
 		
 		btnUndo = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/undo.png")));
-		btnUndo.setBackground(Color.RED);
 		btnUndo.setEnabled(false);
 		btnUndo.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanel.add(btnUndo);
 		
 		btnRedo = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/redo.png")));
-		btnRedo.setBackground(Color.ORANGE);
 		btnRedo.setEnabled(false);
 		btnRedo.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanel.add(btnRedo);
 		
-		btnToFront = new JButton("To front");
-		btnToFront.setForeground(Color.RED);
+		btnToFront = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/to-front.png")));
+		btnToFront.setText("To front");
 		btnToFront.setEnabled(false);
 		btnToFront.setFont(new Font("Lucida Console", Font.BOLD, 11));
-		btnToFront.setBackground(Color.GREEN);
 		btnToFront.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanel.add(btnToFront);
 		
-		btnToBack = new JButton("To back");
+		btnToBack = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/to-back.png")));
+		btnToBack.setText("To back");
 		btnToBack.setFont(new Font("Lucida Console", Font.BOLD, 11));
 		btnToBack.setEnabled(false);
-		btnToBack.setForeground(Color.RED);
-		btnToBack.setBackground(Color.BLUE);
 		btnToBack.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanel.add(btnToBack);
 		
-		btnBringToFront = new JButton("Bring to front");
-		btnBringToFront.setForeground(Color.RED);
+		btnBringToFront = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/bring-to-front.png")));
+		btnBringToFront.setText("Bring to front");
 		btnBringToFront.setEnabled(false);
 		btnBringToFront.setFont(new Font("Lucida Console", Font.BOLD, 11));
-		btnBringToFront.setBackground(Color.PINK);
 		btnBringToFront.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanel.add(btnBringToFront);
 		
-		btnBringToBack = new JButton("Bring to back");
+		btnBringToBack = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/bring-to-back.png")));
+		btnBringToBack.setText("Bring to back");
 		btnBringToBack.setEnabled(false);
-		btnBringToBack.setForeground(Color.RED);
 		btnBringToBack.setFont(new Font("Lucida Console", Font.BOLD, 11));
-		btnBringToBack.setBackground(Color.ORANGE);
 		btnBringToBack.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanel.add(btnBringToBack);
 		
 		activityLog = new JList<String>();
 		activityLog.setEnabled(false);
 		activityLog.setModel(dlmList);
-		activityLog.setBackground(Color.ORANGE);
 		activityLog.setFont(new Font("Lucida Console", Font.BOLD, 12));
 		scrollPane.setViewportView(activityLog);
 
@@ -400,117 +355,6 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 				else if (tglBtnSelect.isSelected()) controller.btnSelectShapeClicked(click);
 			}
 		});
-		
-		view.addMouseMotionListener(new MouseMotionAdapter() {
-			@Override
-			public void mouseMoved(MouseEvent e) {
-				mouseCoordinates.setText("X:" + e.getX() + ", Y:" + e.getY());
-			}
-		});
-	}
-	
-	/**
-	 * Method that add listener to some button and enable it.
-	 * 
-	 * @param button Represent button which need to be updated.
-	 * @param adapter Represent adapter for that button.
-	 */
-	public void addListener(JButton button, MouseAdapter adapter) {
-		if (!button.isEnabled()) {
-			button.setEnabled(true);
-			button.addMouseListener(adapter);
-		}
-	}
-	
-	/**
-	 * Method that remove listener from some button and disable it.
-	 * 
-	 * @param button Represent button which need to be updated.
-	 * @param adapter Represent adapter for that button.
-	 */
-	public void removeListener(JButton button, MouseAdapter adapter) {
-		if (button.isEnabled()) {
-			button.removeMouseListener(adapter);
-			button.setEnabled(false);
-		}
-	}
-	
-	/**
-	 * Listen to changes from {@link DrawingModel} that sends Subject - {@link DrawingController} to update buttons depend on state of draw.
-	 */
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		switch(evt.getPropertyName()) {
-		case "shape selected":
-			addListener(btnDelete, mouseAdapterDelete);
-			break;
-		case "shape exist":
-			tglBtnSelect.setEnabled(true);
-			break;
-		case "shape unselected":
-		case "shape don't exist":
-			removeListener(btnUpdate, mouseAdapterUpdate);
-			removeListener(btnDelete, mouseAdapterDelete);
-			break;
-		case "change position turn off":
-			removeListener(btnToBack, mouseAdapterToBack);
-			removeListener(btnToFront, mouseAdapterToFront);
-			removeListener(btnBringToBack, mouseAdapterBringToBack);
-			removeListener(btnBringToFront, mouseAdapterBringToFront);
-			break;
-		case "update turn off":
-			removeListener(btnUpdate, mouseAdapterUpdate);
-			break;
-		case "update turn on": 
-			addListener(btnUpdate, mouseAdapterUpdate);
-			break;
-		case "redo turn off": 
-			removeListener(btnRedo, mouseAdapterRedo);
-			break;
-		case "redo turn on": 
-			addListener(btnRedo, mouseAdapterRedo);
-			break;
-		case "draw is not empty":
-			addListener(btnSaveDraw, mouseAdapterSaveDrawing);
-			addListener(btnNewDraw, mouseAdapterNewDraw);
-			addListener(btnUndo, mouseAdapterUndo);
-			addListener(btnLog, mouseAdapterLog);
-			break;
-		case "draw is empty":
-			removeListener(btnSaveDraw, mouseAdapterSaveDrawing);
-			removeListener(btnNewDraw, mouseAdapterNewDraw);
-			removeListener(btnUndo, mouseAdapterUndo);
-			removeListener(btnLog, mouseAdapterLog);
-			break;
-		case "draw is loaded":
-			tglBtnSelect.setEnabled(true);
-			addListener(btnNewDraw, mouseAdapterNewDraw);
-			break;
-		case "to back turn on":
-			addListener(btnToBack, mouseAdapterToBack);
-			break;
-		case "to back turn off":
-			removeListener(btnToBack, mouseAdapterToBack);
-			break;
-		case "to front turn on":
-			addListener(btnToFront, mouseAdapterToFront);
-			break;
-		case "to front turn off":
-			removeListener(btnToFront, mouseAdapterToFront);
-			break;
-		case "bring to back turn on":
-			addListener(btnBringToBack, mouseAdapterBringToBack);
-			break;
-		case "bring to back turn off":
-			removeListener(btnBringToBack, mouseAdapterBringToBack);
-			break;
-		case "bring to front turn on":
-			addListener(btnBringToFront, mouseAdapterBringToFront);
-			break;
-		case "bring to front turn off":
-			removeListener(btnBringToFront, mouseAdapterBringToFront);
-			break;
-		}
 	}
 	
 	public DefaultListModel<String> getList() {
@@ -523,6 +367,98 @@ public class DrawingFrame extends JFrame implements PropertyChangeListener {
 	
 	public void setController(DrawingController controller) {
 		this.controller = controller;
-		controller.addPropertyChangedListener(this);
+		controller.addPropertyChangedListener(new DrawingObserver(this));
+	}
+
+	public JToggleButton getTglBtnSelect() {
+		return tglBtnSelect;
+	}
+
+	public JButton getBtnUpdate() {
+		return btnUpdate;
+	}
+
+	public JButton getBtnDelete() {
+		return btnDelete;
+	}
+
+	public JButton getBtnUndo() {
+		return btnUndo;
+	}
+
+	public JButton getBtnRedo() {
+		return btnRedo;
+	}
+
+	public JButton getBtnToFront() {
+		return btnToFront;
+	}
+
+	public JButton getBtnToBack() {
+		return btnToBack;
+	}
+
+	public JButton getBtnBringToFront() {
+		return btnBringToFront;
+	}
+
+	public JButton getBtnBringToBack() {
+		return btnBringToBack;
+	}
+
+	public JButton getBtnNewDraw() {
+		return btnNewDraw;
+	}
+
+	public JButton getBtnSaveDraw() {
+		return btnSaveDraw;
+	}
+
+	public JButton getBtnLog() {
+		return btnLog;
+	}
+
+	public MouseAdapter getMouseAdapterUpdate() {
+		return mouseAdapterUpdate;
+	}
+
+	public MouseAdapter getMouseAdapterDelete() {
+		return mouseAdapterDelete;
+	}
+
+	public MouseAdapter getMouseAdapterUndo() {
+		return mouseAdapterUndo;
+	}
+
+	public MouseAdapter getMouseAdapterRedo() {
+		return mouseAdapterRedo;
+	}
+
+	public MouseAdapter getMouseAdapterNewDraw() {
+		return mouseAdapterNewDraw;
+	}
+
+	public MouseAdapter getMouseAdapterSaveDrawing() {
+		return mouseAdapterSaveDrawing;
+	}
+
+	public MouseAdapter getMouseAdapterLog() {
+		return mouseAdapterLog;
+	}
+
+	public MouseAdapter getMouseAdapterToFront() {
+		return mouseAdapterToFront;
+	}
+
+	public MouseAdapter getMouseAdapterToBack() {
+		return mouseAdapterToBack;
+	}
+
+	public MouseAdapter getMouseAdapterBringToFront() {
+		return mouseAdapterBringToFront;
+	}
+
+	public MouseAdapter getMouseAdapterBringToBack() {
+		return mouseAdapterBringToBack;
 	}
 }

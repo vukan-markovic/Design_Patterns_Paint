@@ -29,6 +29,7 @@ public class Rectangle extends Square {
     public void draw(Graphics g) {
         g.setColor(getColor());
         g.drawRect(upLeft.getXcoordinate(), upLeft.getYcoordinate(), side, width);
+        fillUpShape(g);
         if (isSelected()) selected(g);
     }
     

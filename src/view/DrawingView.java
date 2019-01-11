@@ -3,11 +3,9 @@ package view;
 import java.awt.Graphics;
 import java.util.Iterator;
 import javax.swing.JPanel;
-
 import controller.DrawingController;
 import model.DrawingModel;
 import shapes.Shape;
-import shapes.SurfaceShape;
 
 /**
  * Represent view in MVC architectural pattern.
@@ -26,12 +24,7 @@ public class DrawingView extends JPanel {
 		super.paint(g);
 		if (model != null) {
 			Iterator<Shape> it = model.getAll().iterator();
-
-			while (it.hasNext()) {
-				Shape shapeForDraw = it.next();
-				if (shapeForDraw instanceof SurfaceShape) ((SurfaceShape) shapeForDraw).fillUpShape(g);
-				shapeForDraw.draw(g);
-			}
+			while (it.hasNext()) it.next().draw(g);
 		}
 	}
 	

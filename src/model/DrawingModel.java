@@ -2,24 +2,18 @@ package model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Stack;
-import commands.Command;
 import shapes.Shape;
 
 /**
- * Represent model in MVX architectural pattern. Contains application data.
+ * Represent model in MVC architectural pattern. Contains application data.
  *
  */
 public class DrawingModel implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private ArrayList<Shape> shapes;
-	private Stack<Command> commands;
-	private Stack<Command> undoCommands;
 	
 	public DrawingModel() {
 		shapes = new ArrayList<Shape>();
-		commands = new Stack<Command>();
-		undoCommands = new Stack<Command>();
 	}
 	
 	/**
@@ -92,57 +86,9 @@ public class DrawingModel implements Serializable {
 	public void addToIndex(Shape selectedShape, int index) {
 		shapes.add(index, selectedShape);
 	}
-
-	/**
-	 * Add command to list of executed commands.
-	 */
-	public void addCommand(Command command) {
-		commands.push(command);
-	}
-	
-	/**
-	 * Add command to list of unexecuted commands.
-	 */
-	public void addUndoCommand(Command command) {
-		undoCommands.push(command);
-	}
-	
-	/**
-	 * Remove last executed command.
-	 * 
-	 * @return Represent last executed command.
-	 */
-	public Command removeCommand() {
-		return commands.pop();
-	}
-	
-	/**
-	 * Remove last unexecuted command.
-	 * 
-	 * @return Represent last unexecuted command.
-	 */
-	public Command removeUndoCommand() {
-		return undoCommands.pop();
-	}
 	
 	public Shape getShapeByIndex(int index) {
 		return shapes.get(index);
-	}
-
-	public Command getLastCommand() {
-		return commands.peek();
-	}
-	
-	public Command getLastUndoCommand() {
-		return undoCommands.peek();
-	}
-	
-	public Stack<Command> getUndoCommands() {
-		return undoCommands;
-	}
-	
-	public Stack<Command> getCommands() {
-		return commands;
 	}
 	
 	public ArrayList<Shape> getAll() {

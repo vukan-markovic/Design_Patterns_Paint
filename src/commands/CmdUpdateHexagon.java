@@ -1,6 +1,5 @@
 package commands;
 
-import javax.swing.DefaultListModel;
 import adapter.HexagonAdapter;
 
 /**
@@ -10,15 +9,11 @@ public class CmdUpdateHexagon implements Command {
 	private HexagonAdapter oldState;
 	private HexagonAdapter newState;
 	private HexagonAdapter originalState;
-	private DefaultListModel<String> log;
-	private String command;
 	
-	public CmdUpdateHexagon(HexagonAdapter oldState, HexagonAdapter newState, DefaultListModel<String> log) {
+	public CmdUpdateHexagon(HexagonAdapter oldState, HexagonAdapter newState) {
 		this.oldState = oldState;
 		this.newState = newState;
-		this.log = log;
 		originalState = oldState.clone();
-		command = "Updated->" + oldState.toString() + "->" + newState.toString();
 	}
 	
 	/**
@@ -30,7 +25,6 @@ public class CmdUpdateHexagon implements Command {
 		oldState.setColor(newState.getColor());
 		oldState.setInteriorColor(newState.getInteriorColor());
 		oldState.setR(newState.getR());
-		log.addElement(command);
 	}
 
 	/**
@@ -42,6 +36,5 @@ public class CmdUpdateHexagon implements Command {
 		oldState.setColor(originalState.getColor());
 		oldState.setInteriorColor(originalState.getInteriorColor());
 		oldState.setR(originalState.getR());
-		log.removeElement(command);
 	}
 }

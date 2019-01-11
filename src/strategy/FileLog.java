@@ -13,6 +13,7 @@ import commands.CmdAddShape;
 import commands.CmdBringToBack;
 import commands.CmdBringToFront;
 import commands.CmdRemoveShape;
+import commands.CmdSelectShape;
 import commands.CmdToBack;
 import commands.CmdToFront;
 import commands.CmdUpdateCircle;
@@ -38,7 +39,6 @@ public class FileLog implements FileHandler {
 	private BufferedReader reader;
 	private DrawingFrame frame;
 	private DrawingModel model;
-	private DefaultListModel<String> log;
 	private DlgLogParser logParser;
 	private DrawingController controller;
 	
@@ -46,7 +46,6 @@ public class FileLog implements FileHandler {
 		this.frame = frame;
 		this.model = model; 
 		this.controller = controller;
-		log = frame.getList();
 	}
 
 	/**
@@ -97,32 +96,80 @@ public class FileLog implements FileHandler {
 			String[] commands1 = command.split("->");
 			switch(commands1[0]) {
 				case "Added":
-					controller.executeCommand(new CmdAddShape(parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), model, frame.getList())); 
+					Shape shape = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
+					controller.executeCommand(new CmdAddShape(shape, model));
+					frame.getList().addElement("Added->" + shape.toString());
 					break;
 				case "Updated":
-					Shape shape1 = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
-					int index = model.getIndexOfShape(shape1);
-					if (shape1 instanceof Point) controller.executeCommand(new CmdUpdatePoint((Point) model.getShapeByIndex(index), parsePoint(commands1[2].split(":")[1]), log));
-					else if (shape1 instanceof Line) controller.executeCommand(new CmdUpdateLine((Line) model.getShapeByIndex(index), parseLine(commands1[2].split(":")[1]), log));
-					else if (shape1 instanceof Rectangle) controller.executeCommand(new CmdUpdateRectangle((Rectangle) model.getShapeByIndex(index), parseRectangle(commands1[2].split(":")[1]), log));
-					else if (shape1 instanceof Square) controller.executeCommand(new CmdUpdateSquare((Square) model.getShapeByIndex(index), parseSquare(commands1[2].split(":")[1]), log));
-					else if (shape1 instanceof Circle) controller.executeCommand(new CmdUpdateCircle((Circle) model.getShapeByIndex(index), parseCircle(commands1[2].split(":")[1]), log));
-					else if (shape1 instanceof HexagonAdapter) controller.executeCommand(new CmdUpdateHexagon((HexagonAdapter) model.getShapeByIndex(index), parseHexagon(commands1[2].split(":")[1]), log));
+					Shape oldShape = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
+					int index = model.getIndexOfShape(oldShape);
+					if (oldShape instanceof Point) {
+						Point newPoint = parsePoint(commands1[2].split(":")[1]);
+						controller.executeCommand(new CmdUpdatePoint((Point) model.getShapeByIndex(index), newPoint));
+						frame.getList().addElement("Updated" + oldShape.toString() + "->" + newPoint.toString());
+					}
+					else if (oldShape instanceof Line) {
+						Line newLine = parseLine(commands1[2].split(":")[1]);
+						controller.executeCommand(new CmdUpdateLine((Line) model.getShapeByIndex(index), newLine));
+						frame.getList().addElement("Updated" + oldShape.toString() + "->" + newLine.toString());
+					}
+					else if (oldShape instanceof Rectangle) {
+						Rectangle newRectangle = parseRectangle(commands1[2].split(":")[1]);
+						controller.executeCommand(new CmdUpdateRectangle((Rectangle) model.getShapeByIndex(index), newRectangle));
+						frame.getList().addElement("Updated" + oldShape.toString() + "->" + newRectangle.toString());
+					}
+					else if (oldShape instanceof Square) {
+						Square newSquare = parseSquare(commands1[2].split(":")[1]);
+						controller.executeCommand(new CmdUpdateSquare((Square) model.getShapeByIndex(index), newSquare));
+						frame.getList().addElement("Updated" + oldShape.toString() + "->" + newSquare.toString());
+					}
+					else if (oldShape instanceof Circle) {
+						Circle newCircle = parseCircle(commands1[2].split(":")[1]);
+						controller.executeCommand(new CmdUpdateCircle((Circle) model.getShapeByIndex(index), newCircle));
+						frame.getList().addElement("Updated" + oldShape.toString() + "->" + newCircle.toString());
+					}
+					else if (oldShape instanceof HexagonAdapter) {
+						HexagonAdapter newHexagon = parseHexagon(commands1[2].split(":")[1]);
+						controller.executeCommand(new CmdUpdateHexagon((HexagonAdapter) model.getShapeByIndex(index), newHexagon));
+						frame.getList().addElement("Updated" + oldShape.toString() + "->" + newHexagon.toString());
+					}
 					break;
 				case "Deleted":
-					controller.executeCommand(new CmdRemoveShape(parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), model, log)); 
+					Shape deletedShape = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
+					controller.executeCommand(new CmdRemoveShape(deletedShape, model)); 
+					frame.getList().addElement("Deleted->" + deletedShape.toString());
 					break;
 				case "Moved to front":
-					controller.executeCommand(new CmdToFront(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log));
+					Shape shapeMovedToFront = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
+					controller.executeCommand(new CmdToFront(model, shapeMovedToFront));
+					frame.getList().addElement("Moved to front->" + shapeMovedToFront.toString());
 					break;
 				case "Moved to back":
-					controller.executeCommand(new CmdToBack(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log));
+					Shape shapeMovedToBack = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
+					controller.executeCommand(new CmdToBack(model, shapeMovedToBack));
+					frame.getList().addElement("Moved to back->" + shapeMovedToBack.toString());
 					break;
 				case "Bringed to front":
-					controller.executeCommand(new CmdBringToFront(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log, model.getAll().size() - 1));
+					Shape shapeBringedToFront = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
+					controller.executeCommand(new CmdBringToFront(model, shapeBringedToFront, model.getAll().size() - 1));
+					frame.getList().addElement("Bringed to front->" + shapeBringedToFront.toString());
 					break;
 				case "Bringed to back":
-					controller.executeCommand(new CmdBringToBack(model, parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]), log));
+					Shape shapeBringedToBack = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
+					controller.executeCommand(new CmdBringToBack(model, shapeBringedToBack));
+					frame.getList().addElement("Bringed to back->" + shapeBringedToBack.toString());
+					break;
+				case "Selected":
+					Shape selectedShape = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
+					int index1 = model.getIndexOfShape(selectedShape);
+					controller.executeCommand(new CmdSelectShape(model.getShapeByIndex(index1), true));
+					frame.getList().addElement("Selected->" + selectedShape.toString());
+					break;
+				case "Unselected":
+					Shape unselectedShape = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
+					int index2 = model.getIndexOfShape(unselectedShape);
+					controller.executeCommand(new CmdSelectShape(model.getShapeByIndex(index2), false));
+					frame.getList().addElement("Unselected->" + unselectedShape.toString());
 					break;
 			}
 		
@@ -132,7 +179,9 @@ public class FileLog implements FileHandler {
 				logParser.closeDialog();
 				return;
 			}
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
