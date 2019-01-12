@@ -19,21 +19,21 @@ public class CmdBringToFront implements Command {
 	}
 
 	/**
-	 * Get index of shape, remove it from that place, add it to the last place and add that command to the log.
+	 * Get index of shape, remove it from that place and add it to the last place.
 	 */
 	@Override
 	public void execute() {
-		index =  model.getIndexOfShape(shape);
-		model.removeShapeAtIndex(index);
-		model.addShapeToIndex(size, shape);
+		index =  model.getIndexOf(shape);
+		model.removeAtIndex(index);
+		model.addToIndex(size, shape);
 	}
 
 	/**
-	 * Remove shape from last place, return it to the previous (original) position, and remove command from the log.
+	 * Remove shape from last place and return it to the previous (original) position.
 	 */
 	@Override
 	public void unexecute() {
-		model.removeShapeAtIndex(model.getAll().size() - 1);
-		model.addShapeToIndex(index, shape);
+		model.removeAtIndex(model.getAll().size() - 1);
+		model.addToIndex(index, shape);
 	}
 }

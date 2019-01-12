@@ -282,9 +282,6 @@ public class DlgCircle extends JDialog {
 		this.drawHeight = drawHeight;
     }
 
-    /**
-     * {@inheritDoc DlgSquare#isConfirmed()}
-     */
     public boolean isConfirmed() {
         return confirmed;
     }

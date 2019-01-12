@@ -23,7 +23,7 @@ public class CmdRemoveShape implements Command {
 	}
 
 	/**
-	 * Remove shape from the draw and add that command to the log.
+	 * Remove shape from the draw.
 	 */
 	@Override
 	public void execute() { 
@@ -32,11 +32,19 @@ public class CmdRemoveShape implements Command {
 	}
 
 	/**
-	 * Return previous deleted shape from the draw and remove command from the log.
+	 * Return previous deleted shape to the draw.
 	 */
 	@Override
 	public void unexecute() {
 		if (shapes != null) model.addMultiple(shapes);
 		else model.add(shape);
+	}
+	
+	/**
+	 * Return number of deleted shapes to undo/redo multiple commands from log at once if multiple shapes are deleted at once.
+	 * @return
+	 */
+	public int getSize() {
+		return shapes.size();
 	}
 }

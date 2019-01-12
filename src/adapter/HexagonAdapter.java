@@ -34,8 +34,8 @@ public class HexagonAdapter extends SurfaceShape {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof HexagonAdapter) {
-			Hexagon hexaFromObj = ((HexagonAdapter) obj).hexagon;
-			return hexagon.getX() == hexaFromObj.getX() && hexagon.getY() == hexaFromObj.getY() && hexagon.getR() == hexaFromObj.getR();
+			Hexagon hex = ((HexagonAdapter) obj).hexagon;
+			return hexagon.getX() == hex.getX() && hexagon.getY() == hex.getY() && hexagon.getR() == hex.getR();
 		}
 		return false;
 	}

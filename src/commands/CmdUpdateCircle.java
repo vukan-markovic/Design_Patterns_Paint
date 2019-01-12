@@ -16,7 +16,7 @@ public class CmdUpdateCircle implements Command {
 	}
 	
 	/**
-	 * Update circle and add that command to the log.
+	 * Update circle.
 	 */
 	@Override
 	public void execute() {
@@ -28,7 +28,7 @@ public class CmdUpdateCircle implements Command {
 	}
 
 	/**
-	 * Undo previous updating, return circle to the original values and remove command from the log.
+	 * Undo previous updating and return circle to the original values.
 	 */
 	@Override
 	public void unexecute() {

@@ -39,8 +39,8 @@ public class FileLog implements FileHandler {
 	private BufferedReader reader;
 	private DrawingFrame frame;
 	private DrawingModel model;
-	private DlgLogParser logParser;
 	private DrawingController controller;
+	private DlgLogParser logParser;
 	
 	public FileLog(DrawingFrame frame, DrawingModel model, DrawingController controller) {
 		this.frame = frame;
@@ -61,12 +61,12 @@ public class FileLog implements FileHandler {
 				writer.newLine();
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 		try {
 			writer.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -82,7 +82,7 @@ public class FileLog implements FileHandler {
 			logParser.addCommand(reader.readLine());
 			logParser.setVisible(true);
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 	
@@ -102,42 +102,43 @@ public class FileLog implements FileHandler {
 					break;
 				case "Updated":
 					Shape oldShape = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
-					int index = model.getIndexOfShape(oldShape);
+					int index = model.getIndexOf(oldShape);
 					if (oldShape instanceof Point) {
 						Point newPoint = parsePoint(commands1[2].split(":")[1]);
-						controller.executeCommand(new CmdUpdatePoint((Point) model.getShapeByIndex(index), newPoint));
-						frame.getList().addElement("Updated" + oldShape.toString() + "->" + newPoint.toString());
+						controller.executeCommand(new CmdUpdatePoint((Point) model.getByIndex(index), newPoint));
+						frame.getList().addElement("Updated->" + oldShape.toString() + "->" + newPoint.toString());
 					}
 					else if (oldShape instanceof Line) {
 						Line newLine = parseLine(commands1[2].split(":")[1]);
-						controller.executeCommand(new CmdUpdateLine((Line) model.getShapeByIndex(index), newLine));
-						frame.getList().addElement("Updated" + oldShape.toString() + "->" + newLine.toString());
+						controller.executeCommand(new CmdUpdateLine((Line) model.getByIndex(index), newLine));
+						frame.getList().addElement("Updated->" + oldShape.toString() + "->" + newLine.toString());
 					}
 					else if (oldShape instanceof Rectangle) {
 						Rectangle newRectangle = parseRectangle(commands1[2].split(":")[1]);
-						controller.executeCommand(new CmdUpdateRectangle((Rectangle) model.getShapeByIndex(index), newRectangle));
-						frame.getList().addElement("Updated" + oldShape.toString() + "->" + newRectangle.toString());
+						controller.executeCommand(new CmdUpdateRectangle((Rectangle) model.getByIndex(index), newRectangle));
+						frame.getList().addElement("Updated->" + oldShape.toString() + "->" + newRectangle.toString());
 					}
 					else if (oldShape instanceof Square) {
 						Square newSquare = parseSquare(commands1[2].split(":")[1]);
-						controller.executeCommand(new CmdUpdateSquare((Square) model.getShapeByIndex(index), newSquare));
-						frame.getList().addElement("Updated" + oldShape.toString() + "->" + newSquare.toString());
+						controller.executeCommand(new CmdUpdateSquare((Square) model.getByIndex(index), newSquare));
+						frame.getList().addElement("Updated->" + oldShape.toString() + "->" + newSquare.toString());
 					}
 					else if (oldShape instanceof Circle) {
 						Circle newCircle = parseCircle(commands1[2].split(":")[1]);
-						controller.executeCommand(new CmdUpdateCircle((Circle) model.getShapeByIndex(index), newCircle));
-						frame.getList().addElement("Updated" + oldShape.toString() + "->" + newCircle.toString());
+						controller.executeCommand(new CmdUpdateCircle((Circle) model.getByIndex(index), newCircle));
+						frame.getList().addElement("Updated->" + oldShape.toString() + "->" + newCircle.toString());
 					}
 					else if (oldShape instanceof HexagonAdapter) {
 						HexagonAdapter newHexagon = parseHexagon(commands1[2].split(":")[1]);
-						controller.executeCommand(new CmdUpdateHexagon((HexagonAdapter) model.getShapeByIndex(index), newHexagon));
-						frame.getList().addElement("Updated" + oldShape.toString() + "->" + newHexagon.toString());
+						controller.executeCommand(new CmdUpdateHexagon((HexagonAdapter) model.getByIndex(index), newHexagon));
+						frame.getList().addElement("Updated->" + oldShape.toString() + "->" + newHexagon.toString());
 					}
 					break;
 				case "Deleted":
 					Shape deletedShape = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
 					controller.executeCommand(new CmdRemoveShape(deletedShape, model)); 
 					frame.getList().addElement("Deleted->" + deletedShape.toString());
+					controller.handleSelect("Deleted", "parser");
 					break;
 				case "Moved to front":
 					Shape shapeMovedToFront = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
@@ -161,15 +162,17 @@ public class FileLog implements FileHandler {
 					break;
 				case "Selected":
 					Shape selectedShape = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
-					int index1 = model.getIndexOfShape(selectedShape);
-					controller.executeCommand(new CmdSelectShape(model.getShapeByIndex(index1), true));
+					int index1 = model.getIndexOf(selectedShape);
+					controller.executeCommand(new CmdSelectShape(model.getByIndex(index1), true));
 					frame.getList().addElement("Selected->" + selectedShape.toString());
+					controller.handleSelect("Selected", "parser");
 					break;
 				case "Unselected":
 					Shape unselectedShape = parseShape(commands1[1].split(":")[0], commands1[1].split(":")[1]);
-					int index2 = model.getIndexOfShape(unselectedShape);
-					controller.executeCommand(new CmdSelectShape(model.getShapeByIndex(index2), false));
+					int index2 = model.getIndexOf(unselectedShape);
+					controller.executeCommand(new CmdSelectShape(model.getByIndex(index2), false));
 					frame.getList().addElement("Unselected->" + unselectedShape.toString());
+					controller.handleSelect("Unselected", "parser");
 					break;
 			}
 		
@@ -180,7 +183,7 @@ public class FileLog implements FileHandler {
 				return;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 	

@@ -17,21 +17,21 @@ public class CmdToBack implements Command {
 	}
 
 	/**
-	 * Get index of shape, remove it from that position, add it to position at index less by one and add command to the log.
+	 * Get index of shape, remove it from that position and add it to position at index less by one.
 	 */
 	@Override
 	public void execute() {
-		index =  model.getIndexOfShape(shape);
-		model.removeShapeAtIndex(index);
-		model.addShapeToIndex(index - 1, shape);
+		index =  model.getIndexOf(shape);
+		model.removeAtIndex(index);
+		model.addToIndex(index - 1, shape);
 	}
 
 	/**
-	 * Get index of shape, remove it from previous position, return it to old position and remove command from the log.
+	 * Get index of shape, remove it from previous position and return it to old position.
 	 */
 	@Override
 	public void unexecute() {	
-		model.removeShapeAtIndex(index - 1);
-		model.addShapeToIndex(index, shape);
+		model.removeAtIndex(index - 1);
+		model.addToIndex(index, shape);
 	}
 }

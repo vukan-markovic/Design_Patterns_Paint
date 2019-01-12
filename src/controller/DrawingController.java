@@ -64,12 +64,12 @@ public class DrawingController {
 	private Color choosenEdgeColor;
 	private Color choosenInteriorColor;
 	private PropertyChangeSupport propertyChangeSupport;
-	private int counter = 0;
+	private int counterOfSelectedShapes = 0;
 	private FileManager fileManager;
 	private DefaultListModel<String> log;
+	private Stack<String> undoCommandsLog;
 	private Stack<Command> commands;
 	private Stack<Command> undoCommands;
-	private Stack<String> undoCommandsLog;
 	
 	public DrawingController(DrawingModel model, DrawingFrame frame) {
 		this.model = model;
@@ -256,55 +256,61 @@ public class DrawingController {
 		
 		while(iterator.hasNext()) {
 			Shape shapeForSelection = iterator.next();
-			if(shapeForSelection.containsClick(click.getX(), click.getY())) tempListOfShapes.add(model.getIndexOfShape(shapeForSelection));
+			if(shapeForSelection.containsClick(click.getX(), click.getY())) tempListOfShapes.add(model.getIndexOf(shapeForSelection));
 		}
 		
 		if (!tempListOfShapes.isEmpty()) {
-			Shape shape = model.getShapeByIndex(Collections.max(tempListOfShapes));
+			Shape shape = model.getByIndex(Collections.max(tempListOfShapes));
 
 			if (!shape.isSelected()) {
-				++counter;
+				++counterOfSelectedShapes;
 				executeCommand(new CmdSelectShape(shape, true));
-				frame.getList().addElement("Selected->" + shape.toString());
+				log.addElement("Selected->" + shape.toString());
 			}
 			else {
-				--counter;
+				--counterOfSelectedShapes;
 				executeCommand(new CmdSelectShape(shape, false));
-				frame.getList().addElement("Unselected->" + shape.toString());
+				log.addElement("Unselected->" + shape.toString());
 			}
 			
-			if (counter == 0)  {
-				propertyChangeSupport.firePropertyChange("shape unselected", false, true);
-				propertyChangeSupport.firePropertyChange("change position turn off", false, true);
-			}  
-			
-			if (counter == 1)  {
-				propertyChangeSupport.firePropertyChange("update turn on", false, true);
-				propertyChangeSupport.firePropertyChange("shape selected", false, true);
-			}  
-			else if (counter > 1) {
-				propertyChangeSupport.firePropertyChange("update turn off", false, true);
-				propertyChangeSupport.firePropertyChange("change position turn off", false, true);
-			}
-			if (counter == 1 && model.getAll().size() >= 2) {
-				if (model.getIndexOfShape(shape) != 0) {
-					propertyChangeSupport.firePropertyChange("to back turn on", false, true);
-					propertyChangeSupport.firePropertyChange("bring to back turn on", false, true);
-				} else {
-					propertyChangeSupport.firePropertyChange("to back turn off", false, true);
-					propertyChangeSupport.firePropertyChange("bring to back turn off", false, true);
-				}
-				if (model.getIndexOfShape(shape) != model.getAll().size() - 1) {
-					propertyChangeSupport.firePropertyChange("to front turn on", false, true);
-					propertyChangeSupport.firePropertyChange("bring to front turn on", false, true);
-				} else {
-					propertyChangeSupport.firePropertyChange("to front turn off", false, true);
-					propertyChangeSupport.firePropertyChange("bring to front turn off", false, true);
-				}
-			}
+			handleSelectButtons();
 		}
 		
 		frame.getView().repaint();	
+	}
+	
+	/**
+	 * Count how many shapes are selected.
+	 * This method is called by undo command, redo command and log parser.
+	 * 
+	 * @param s Undo or redo command.
+	 * @param command Selection or unselection.
+	 */
+	public void handleSelect(String s, String command) {
+		if (command.equals("redo")) {
+			if (s.equals("Selected")) ++counterOfSelectedShapes;
+			else --counterOfSelectedShapes;
+			handleSelectButtons();
+		} else if (command.equals("undo")) {
+			if (s.equals("Selected")) --counterOfSelectedShapes;
+			else ++counterOfSelectedShapes;
+			handleSelectButtons();
+		} else if (command.equals("parser")) {
+			if (s.equals("Selected")) ++counterOfSelectedShapes;
+			else --counterOfSelectedShapes;
+		}
+	}
+	
+	/**
+	 * Handle buttons state depend on number of selected shapes.
+	 */
+	public void handleSelectButtons() {
+		if (counterOfSelectedShapes == 0) propertyChangeSupport.firePropertyChange("shape unselected", false, true);
+		else if (counterOfSelectedShapes == 1)  {
+			propertyChangeSupport.firePropertyChange("update/move turn on", false, true);
+			propertyChangeSupport.firePropertyChange("shape selected", false, true);
+		}  
+		else if (counterOfSelectedShapes > 1) propertyChangeSupport.firePropertyChange("update/move turn off", false, true);
 	}
 	
 	/**
@@ -319,7 +325,7 @@ public class DrawingController {
 		else if (shape instanceof Rectangle) btnUpdateRectangleClicked((Rectangle) shape);
 		else if (shape instanceof Square) btnUpdateSquareClicked((Square) shape);
 		else if (shape instanceof Circle) btnUpdateCircleClicked((Circle) shape);
-		else btnUpdateHexagonClicked((HexagonAdapter) shape);
+		else if (shape instanceof HexagonAdapter) btnUpdateHexagonClicked((HexagonAdapter) shape);
 	}
 
 	/**
@@ -444,16 +450,8 @@ public class DrawingController {
 	 */ 
 	public void toFront() {
 		Shape shape = getSelectedShape();
-		if (model.getIndexOfShape(shape) == model.getAll().size() - 1) JOptionPane.showMessageDialog(null, "Shape is already on top!");
+		if (model.getIndexOf(shape) == model.getAll().size() - 1) JOptionPane.showMessageDialog(null, "Shape is already on top!");
 		else {
-			if (model.getIndexOfShape(shape) == model.getAll().size() - 2) {
-				propertyChangeSupport.firePropertyChange("to front turn off", false, true);
-				propertyChangeSupport.firePropertyChange("bring to front turn off", false, true);
-			}
-			else if (model.getIndexOfShape(shape) == 0) {
-				propertyChangeSupport.firePropertyChange("to back turn on", false, true);
-				propertyChangeSupport.firePropertyChange("bring to back turn on", false, true);
-			}
 			executeCommand(new CmdToFront(model, shape));
 			log.addElement("Moved to front->" + shape.toString());
 		}
@@ -464,12 +462,8 @@ public class DrawingController {
 	 */ 
 	public void bringToFront() {
 		Shape shape = getSelectedShape();
-		if (model.getIndexOfShape(shape) == model.getAll().size() - 1) JOptionPane.showMessageDialog(null, "Shape is already on top!");
+		if (model.getIndexOf(shape) == model.getAll().size() - 1) JOptionPane.showMessageDialog(null, "Shape is already on top!");
 		else {
-			propertyChangeSupport.firePropertyChange("to front turn off", false, true);
-			propertyChangeSupport.firePropertyChange("bring to front turn off", false, true);
-			propertyChangeSupport.firePropertyChange("to back turn on", false, true);
-			propertyChangeSupport.firePropertyChange("bring to back turn on", false, true);
 			executeCommand(new CmdBringToFront(model, shape, model.getAll().size() - 1));
 			log.addElement("Bringed to front->" + shape.toString());
 		}
@@ -480,16 +474,8 @@ public class DrawingController {
 	 */ 
 	public void toBack() {
 		Shape shape = getSelectedShape();
-		if (model.getIndexOfShape(shape) == 0) JOptionPane.showMessageDialog(null, "Shape is already on bottom!");
+		if (model.getIndexOf(shape) == 0) JOptionPane.showMessageDialog(null, "Shape is already on bottom!");
 		else {
-			if (model.getIndexOfShape(shape) == 1) {
-				propertyChangeSupport.firePropertyChange("to back turn off", false, true);
-				propertyChangeSupport.firePropertyChange("bring to back turn off", false, true);
-			}
-			else if (model.getIndexOfShape(shape) == model.getAll().size() - 1) {
-				propertyChangeSupport.firePropertyChange("to front turn on", false, true);
-				propertyChangeSupport.firePropertyChange("bring to front turn on", false, true);
-			}
 			executeCommand(new CmdToBack(model, shape));
 			log.addElement("Moved to back->" + shape.toString());
 		}
@@ -500,12 +486,8 @@ public class DrawingController {
 	 */ 
 	public void bringToBack() {
 		Shape shape = getSelectedShape();
-		if (model.getIndexOfShape(shape) == 0) JOptionPane.showMessageDialog(null, "Shape is already on bottom!");
+		if (model.getIndexOf(shape) == 0) JOptionPane.showMessageDialog(null, "Shape is already on bottom!");
 		else {
-			propertyChangeSupport.firePropertyChange("to back turn off", false, true);
-			propertyChangeSupport.firePropertyChange("bring to back turn off", false, true);
-			propertyChangeSupport.firePropertyChange("to front turn on", false, true);
-			propertyChangeSupport.firePropertyChange("bring to front turn on", false, true);
 			executeCommand(new CmdBringToBack(model, shape));
 			log.addElement("Bringed to back->" + shape.toString());
 		}
@@ -539,11 +521,13 @@ public class DrawingController {
 				Shape shape = it.next();
 				if(shape.isSelected()) {
 					shapesForDeletion.add(shape);
+					counterOfSelectedShapes--;
 					log.addElement("Deleted->" + shape.toString());
-				}
+				}	
 			}
 			
 			executeCommand(new CmdRemoveShape(shapesForDeletion, model));
+			handleSelectButtons();
 		}
 	}
 	
@@ -564,7 +548,7 @@ public class DrawingController {
 		}
 		
 		if (model.getAll().isEmpty()) propertyChangeSupport.firePropertyChange("shape don't exist", false, true);
-		else if (model.getAll().size() == 1 && (command instanceof CmdAddShape || command instanceof CmdRemoveShape)) propertyChangeSupport.firePropertyChange("shape exist", false, true);
+		else if (model.getAll().size() == 1) propertyChangeSupport.firePropertyChange("shape exist", false, true);
 		
 		if (commands.size() == 1) propertyChangeSupport.firePropertyChange("draw is not empty", false, true);
 		if (commands.isEmpty()) propertyChangeSupport.firePropertyChange("draw is empty", false, true);
@@ -580,9 +564,14 @@ public class DrawingController {
 	 */
 	public void undo() {
 		commands.peek().unexecute();
-		undoCommandsLog.add(log.remove(log.size() - 1));
+		if (commands.peek() instanceof CmdRemoveShape) {
+			int i = ((CmdRemoveShape) commands.peek()).getSize();
+			for (int j = 0; j < i; j++) undoCommandsLog.add(log.remove(log.size() - 1));
+		}
+		else undoCommandsLog.add(log.remove(log.size() - 1));
+		if (commands.peek() instanceof CmdSelectShape) handleSelect((log.get(log.size() - 1)).split("->")[0], "undo");
 		undoCommands.push(commands.pop());
-		if (frame.getList().isEmpty()) propertyChangeSupport.firePropertyChange("log turn off", false, true);
+		if (log.isEmpty()) propertyChangeSupport.firePropertyChange("log turn off", false, true);
 		if (undoCommands.size() == 1) propertyChangeSupport.firePropertyChange("redo turn on", false, true);
 		if (commands.isEmpty()) propertyChangeSupport.firePropertyChange("draw is empty", false, true);
 		frame.getView().repaint();
@@ -597,7 +586,12 @@ public class DrawingController {
 	 */
 	public void redo() {		
 		undoCommands.peek().execute();
-		log.addElement(undoCommandsLog.pop());
+		if (undoCommands.peek() instanceof CmdRemoveShape) {
+			int i = ((CmdRemoveShape) undoCommands.peek()).getSize();
+			for (int j = 0; j < i; j++) log.addElement(undoCommandsLog.pop());
+		}
+		else log.addElement(undoCommandsLog.pop());
+		if (undoCommands.peek() instanceof CmdSelectShape) handleSelect((log.get(log.size() - 1)).split("->")[0], "redo");
 		commands.push((undoCommands.pop()));
 		if (undoCommands.isEmpty()) propertyChangeSupport.firePropertyChange("redo turn off", false, true);
 		if (commands.size() == 1) {
@@ -656,15 +650,17 @@ public class DrawingController {
 		chooser.setFileFilter(new FileNameExtensionFilter("Commands log", "log"));
 		if(chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 			model.removeAll();
-			frame.getList().removeAllElements();
+			log.removeAllElements();
 			undoCommands.clear();
 			undoCommandsLog.clear();
 			commands.clear();
 			frame.getView().repaint();
-			if (chooser.getFileFilter().getDescription().equals("Serialized draw")) fileManager = new FileManager(new FileDraw(model));
+			if (chooser.getFileFilter().getDescription().equals("Serialized draw")) {
+				fileManager = new FileManager(new FileDraw(model));
+				propertyChangeSupport.firePropertyChange("serialized draw opened", false, true);
+			}
 			else if (chooser.getFileFilter().getDescription().equals("Commands log")) fileManager = new FileManager(new FileLog(frame, model, this));
 			fileManager.open(chooser.getSelectedFile());
-			propertyChangeSupport.firePropertyChange("draw is loaded", false, true);
 		}	
 		chooser.setVisible(false);
 	}
@@ -675,7 +671,7 @@ public class DrawingController {
 	public void newDraw() {
 		if(JOptionPane.showConfirmDialog(null, "Are you sure that you want to start new draw?", "Warning!", JOptionPane.YES_NO_OPTION) == 0) {	
 			model.removeAll();
-			frame.getList().removeAllElements();
+			log.removeAllElements();
 			undoCommands.clear();
 			undoCommandsLog.clear();
 			commands.clear();

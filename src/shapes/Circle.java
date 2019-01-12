@@ -38,8 +38,8 @@ public class Circle extends SurfaceShape {
     @Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Circle) {
-			Circle castedObj = (Circle) obj;
-			return center.equals(castedObj.getCenter()) && radius == castedObj.getRadius();
+			Circle circle = (Circle) obj;
+			return center.equals(circle.getCenter()) && radius == circle.getRadius();
 		}
 		return false;
 	}
@@ -48,8 +48,8 @@ public class Circle extends SurfaceShape {
      * Compare two circles by radius length.
      */
     @Override
-	public int compareTo(Shape o) {
-		if (o instanceof Circle) return radius - ((Circle) o).getRadius();
+	public int compareTo(Shape shape) {
+		if (shape instanceof Circle) return radius - ((Circle) shape).getRadius();
 		return 0;
 	}
     

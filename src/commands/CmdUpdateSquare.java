@@ -16,7 +16,7 @@ public class CmdUpdateSquare implements Command {
 	}
 	
 	/**
-	 * Update square and add that command to the log.
+	 * Update square.
 	 */
 	@Override
 	public void execute() {
@@ -28,7 +28,7 @@ public class CmdUpdateSquare implements Command {
 	}
 
 	/**
-	 * Undo previous updating, return square to the original values and remove command from the log.
+	 * Undo previous updating and return square to the original values.
 	 */
 	@Override
 	public void unexecute() {
