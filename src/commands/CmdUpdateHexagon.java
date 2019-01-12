@@ -13,14 +13,14 @@ public class CmdUpdateHexagon implements Command {
 	public CmdUpdateHexagon(HexagonAdapter oldState, HexagonAdapter newState) {
 		this.oldState = oldState;
 		this.newState = newState;
-		originalState = oldState.clone();
 	}
 	
 	/**
-	 * Update hexagon and add that command to the log.
+	 * Update hexagon.
 	 */
 	@Override
 	public void execute() {
+		originalState = oldState.clone();
 		oldState.moveTo(newState.getXcoordinate(), newState.getYcoordinate());
 		oldState.setColor(newState.getColor());
 		oldState.setInteriorColor(newState.getInteriorColor());
@@ -28,7 +28,7 @@ public class CmdUpdateHexagon implements Command {
 	}
 
 	/**
-	 * Undo previous updating, return hexagon to the original values and remove command from the log.
+	 * Undo previous updating and return hexagon to the original values.
 	 */
 	@Override
 	public void unexecute() {

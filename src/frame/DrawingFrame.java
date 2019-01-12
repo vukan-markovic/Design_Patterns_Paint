@@ -21,6 +21,12 @@ public class DrawingFrame extends JFrame {
 	private DrawingController controller;
 	private Color color = Color.BLACK;
 	private JToggleButton tglBtnSelect;
+	private JToggleButton tglBtnDrawPoint;
+	private JToggleButton tglBtnDrawCircle;
+	private JToggleButton tglBtnDrawHexagon;
+	private JToggleButton tglBtnDrawLine;
+	private JToggleButton tglBtnDrawSquare;
+	private JToggleButton tglBtnDrawRectangle;
 	private JButton btnUpdate;
 	private JButton btnDelete;
 	private JButton btnUndo;
@@ -32,6 +38,10 @@ public class DrawingFrame extends JFrame {
 	private JButton btnNewDraw;
 	private JButton btnSaveDraw;
 	private JButton btnLog;
+	private JButton btnInteriorColor;
+	private JButton btnEdgeColor;
+	private MouseAdapter mouseAdapterEdgeColor;
+	private MouseAdapter mouseAdapterInteriorColor;
 	private MouseAdapter mouseAdapterUpdate;
 	private MouseAdapter mouseAdapterDelete;
 	private MouseAdapter mouseAdapterUndo;
@@ -79,7 +89,7 @@ public class DrawingFrame extends JFrame {
 		mainPanel.add(view, BorderLayout.CENTER);
 		buttonsGroup = new ButtonGroup();
 
-		JToggleButton tglBtnDrawPoint = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/point.png")));
+		tglBtnDrawPoint = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/point.png")));
 		tglBtnDrawPoint.setFont(new Font("Dotum", Font.BOLD, 12));
 		tglBtnDrawPoint.setText("Point");
 		tglBtnDrawPoint.setSelected(true);
@@ -87,35 +97,35 @@ public class DrawingFrame extends JFrame {
 		tglBtnDrawPoint.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawPoint.getX(), tglBtnDrawPoint.getY()), "img"));
 		buttonsPanelForDrawing.add(tglBtnDrawPoint);
 
-		JToggleButton tglBtnDrawSquare = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/square.png")));
+		tglBtnDrawSquare = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/square.png")));
 		tglBtnDrawSquare.setFont(new Font("Dotum", Font.BOLD, 12));
 		tglBtnDrawSquare.setText("Square");
 		buttonsGroup.add(tglBtnDrawSquare);
 		tglBtnDrawSquare.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanelForDrawing.add(tglBtnDrawSquare);
 
-		JToggleButton tglBtnDrawRectangle = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/rectangle.png")));
+		tglBtnDrawRectangle = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/rectangle.png")));
 		tglBtnDrawRectangle.setFont(new Font("Dotum", Font.BOLD, 12));
 		tglBtnDrawRectangle.setText("Rectangle");
 		buttonsGroup.add(tglBtnDrawRectangle);
 		tglBtnDrawRectangle.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanelForDrawing.add(tglBtnDrawRectangle);
 
-		JToggleButton tglBtnDrawLine = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/line.png")));
+		tglBtnDrawLine = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/line.png")));
 		tglBtnDrawLine.setFont(new Font("Dotum", Font.BOLD, 12));
 		tglBtnDrawLine.setText("Line");
 		buttonsGroup.add(tglBtnDrawLine);
 		tglBtnDrawLine.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanelForDrawing.add(tglBtnDrawLine);
 
-		JToggleButton tglBtnDrawCircle = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/circle.png")));
+		tglBtnDrawCircle = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/circle.png")));
 		tglBtnDrawCircle.setFont(new Font("Dotum", Font.BOLD, 12));
 		tglBtnDrawCircle.setText("Circle");
 		buttonsGroup.add(tglBtnDrawCircle);
 		tglBtnDrawCircle.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanelForDrawing.add(tglBtnDrawCircle);
 		
-		JToggleButton tglBtnDrawHexagon = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/hexagon.png")));
+		tglBtnDrawHexagon = new JToggleButton(new ImageIcon(DrawingFrame.class.getResource("/icons/hexagon.png")));
 		tglBtnDrawHexagon.setFont(new Font("Dotum", Font.BOLD, 12));
 		tglBtnDrawHexagon.setText("Hexagon");
 		buttonsGroup.add(tglBtnDrawHexagon);
@@ -167,19 +177,41 @@ public class DrawingFrame extends JFrame {
 		buttonsGroup.add(btnDelete);
 		btnDelete.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
 		buttonsPanel.add(btnDelete);
+		
+		mouseAdapterEdgeColor = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
+				color = controller.btnEdgeColorClicked();
+				if (color != null) btnEdgeColor.setBackground(color);
+			}
+		};
+		
+		mouseAdapterInteriorColor = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent click) {
+				color = controller.btnInteriorColorClicked();
+				if (color != null) {
+					if (color.equals(Color.BLACK)) btnInteriorColor.setForeground(Color.WHITE);
+					else if (color.equals(Color.WHITE)) btnInteriorColor.setForeground(Color.BLACK);
+					btnInteriorColor.setBackground(color);
+				}
+			}
+		};
 
-		JButton btnEdgeColor = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/picker.png")));
+		btnEdgeColor = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/picker.png")));
 		btnEdgeColor.setForeground(Color.WHITE);
 		btnEdgeColor.setText("Edge color");
 		btnEdgeColor.setBackground(Color.BLACK);
 		btnEdgeColor.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
+		btnEdgeColor.addMouseListener(mouseAdapterEdgeColor);
 		buttonsPanel.add(btnEdgeColor);
 
-		JButton btnInteriorColor = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/color-picker.png")));
+		btnInteriorColor = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/color-picker.png")));
 		btnInteriorColor.setText("Area color");
 		btnInteriorColor.setForeground(Color.BLACK);
 		btnInteriorColor.setBackground(Color.WHITE);
 		btnInteriorColor.setCursor(toolkit.createCustomCursor(image1 , new java.awt.Point(tglBtnDrawSquare.getX(), tglBtnDrawSquare.getY()), "img"));
+		btnInteriorColor.addMouseListener(mouseAdapterInteriorColor);
 		buttonsPanel.add(btnInteriorColor);
 		
 		btnUndo = new JButton(new ImageIcon(DrawingFrame.class.getResource("/icons/undo.png")));
@@ -316,26 +348,6 @@ public class DrawingFrame extends JFrame {
 			}
 		};
 		
-		btnEdgeColor.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent click) {
-				color = controller.btnEdgeColorClicked();
-				if (color != null) btnEdgeColor.setBackground(color);
-			}
-		});
-
-		btnInteriorColor.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent click) {
-				color = controller.btnInteriorColorClicked();
-				if (color != null) {
-					if (color.equals(Color.BLACK)) btnInteriorColor.setForeground(Color.WHITE);
-					else if (color.equals(Color.WHITE)) btnInteriorColor.setForeground(Color.BLACK);
-					btnInteriorColor.setBackground(color);
-				}
-			}
-		});
-		
 		btnOpenDraw.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -363,11 +375,6 @@ public class DrawingFrame extends JFrame {
 	
 	public DrawingView getView() {
 		return view;
-	}
-	
-	public void setController(DrawingController controller) {
-		this.controller = controller;
-		controller.addPropertyChangedListener(new DrawingObserver(this));
 	}
 
 	public JToggleButton getTglBtnSelect() {
@@ -460,5 +467,58 @@ public class DrawingFrame extends JFrame {
 
 	public MouseAdapter getMouseAdapterBringToBack() {
 		return mouseAdapterBringToBack;
+	}
+	
+	public void setController(DrawingController controller) {
+		this.controller = controller;
+		controller.addPropertyChangedListener(new DrawingObserver(this));
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public JToggleButton getTglBtnDrawPoint() {
+		return tglBtnDrawPoint;
+	}
+
+	public JToggleButton getTglBtnDrawCircle() {
+		return tglBtnDrawCircle;
+	}
+
+	public JToggleButton getTglBtnDrawHexagon() {
+		return tglBtnDrawHexagon;
+	}
+
+	public JToggleButton getTglBtnDrawLine() {
+		return tglBtnDrawLine;
+	}
+
+	public JToggleButton getTglBtnDrawSquare() {
+		return tglBtnDrawSquare;
+	}
+
+	public JToggleButton getTglBtnDrawRectangle() {
+		return tglBtnDrawRectangle;
+	}
+
+	public JButton getBtnInteriorColor() {
+		return btnInteriorColor;
+	}
+
+	public JButton getBtnEdgeColor() {
+		return btnEdgeColor;
+	}
+
+	public MouseAdapter getMouseAdapterEdgeColor() {
+		return mouseAdapterEdgeColor;
+	}
+
+	public MouseAdapter getMouseAdapterInteriorColor() {
+		return mouseAdapterInteriorColor;
+	}
+
+	public JList<String> getActivityLog() {
+		return activityLog;
 	}
 }

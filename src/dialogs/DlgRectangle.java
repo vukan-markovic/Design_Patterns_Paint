@@ -275,9 +275,6 @@ public class DlgRectangle extends JDialog {
 		btnInteriorColor.setVisible(false);
 	}
 	
-	/**
-     * {@inheritDoc DlgSquare#isConfirmed()}
-     */
 	public boolean isConfirmed() {
 		return confirmed;
 	}

@@ -39,8 +39,8 @@ public class Rectangle extends Square {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Rectangle) {
-			Rectangle castedObj = (Rectangle) obj;
-			return upLeft.equals(castedObj.upLeft) && width == castedObj.getWidth() && side == castedObj.side;
+			Rectangle rectangle = (Rectangle) obj;
+			return upLeft.equals(rectangle.upLeft) && width == rectangle.getWidth() && side == rectangle.side;
 		}
 		return false;
 	}

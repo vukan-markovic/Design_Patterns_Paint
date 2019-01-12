@@ -4,7 +4,6 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import shapes.Square;
-
 import java.awt.event.*;
 
 /**
@@ -253,11 +252,6 @@ public class DlgSquare extends JDialog {
 		btnInteriorColor.setVisible(false);
 	}
 
-	/**
-	 * Method that determine if user confirm dialog.
-	 * 
-	 * @return Boolean that indicate if user confirm dialog.
-	 */
 	public boolean isConfirmed() {
 		return confirmed;
 	}

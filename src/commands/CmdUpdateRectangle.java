@@ -18,11 +18,11 @@ public class CmdUpdateRectangle implements Command {
 	}
 	
 	/**
-	 * Update rectangle and add that command to the log.
+	 * Update rectangle.
 	 */
 	@Override
 	public void execute() {
-		originalState = (Rectangle) oldState.clone();
+		originalState = oldState.clone();
 		oldState.setUpLeft(newState.getUpLeft().clone());
 		oldState.setWidth(newState.getWidth());
 		oldState.setSide(newState.getSide());
@@ -31,7 +31,7 @@ public class CmdUpdateRectangle implements Command {
 	}
 
 	/**
-	 * Undo previous updating, return rectangle to the original values and remove command from the log.
+	 * Undo previous updating and return rectangle to the original values.
 	 */
 	@Override
 	public void unexecute() {

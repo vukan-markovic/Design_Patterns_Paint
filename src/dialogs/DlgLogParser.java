@@ -101,14 +101,14 @@ public class DlgLogParser extends JDialog {
 		log.addElement(command);
 	}
 
-	public void setFileLog(FileLog fileLog) {
-		this.fileLog = fileLog;
-	}
-
 	/**
 	 * <h3>Method that closes this dialog.</h3> 
 	 */
 	public void closeDialog() {
 		dispose();
+	}
+	
+	public void setFileLog(FileLog fileLog) {
+		this.fileLog = fileLog;
 	}
 }

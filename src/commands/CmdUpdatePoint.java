@@ -16,7 +16,7 @@ public class CmdUpdatePoint implements Command {
 	}
 	
 	/**
-	 * Update point and add that command to the log.
+	 * Update point.
 	 */
 	@Override
 	public void execute() {
@@ -26,7 +26,7 @@ public class CmdUpdatePoint implements Command {
 	}
 
 	/**
-	 * Undo previous updating, return point to the original values and remove command from the log.
+	 * Undo previous updating and return point to the original values.
 	 */
 	@Override
 	public void unexecute() {

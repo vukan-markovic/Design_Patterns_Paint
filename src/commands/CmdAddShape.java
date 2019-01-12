@@ -16,7 +16,7 @@ public class CmdAddShape implements Command {
 	}
 	
 	/**
-	 * Add new shape to the draw and add that command to the log.
+	 * Add new shape to the draw.
 	 */
 	@Override
 	public void execute() {
@@ -24,7 +24,7 @@ public class CmdAddShape implements Command {
 	}
 
 	/**
-	 * Remove previous added shape from the draw and add that command to the log.
+	 * Remove previous added shape to the draw.
 	 */
 	@Override
 	public void unexecute() {	

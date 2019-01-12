@@ -16,7 +16,7 @@ public class CmdUpdateLine implements Command {
 	}
 	
 	/**
-	 * Update line and add that command to the log.
+	 * Update line.
 	 */
 	@Override
 	public void execute() {
@@ -27,7 +27,7 @@ public class CmdUpdateLine implements Command {
 	}
 
 	/**
-	 * Undo previous updating, return line to the original values and remove command from the log.
+	 * Undo previous updating and return line to the original values.
 	 */
 	@Override
 	public void unexecute() {

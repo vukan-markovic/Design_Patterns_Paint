@@ -40,8 +40,8 @@ public class Line extends Shape {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Line) {
-			Line castedObj = (Line) obj;
-			return initial.equals(castedObj.initial) && last.equals(castedObj.last);
+			Line line = (Line) obj;
+			return initial.equals(line.initial) && last.equals(line.last);
 		}
 		return false;
 	}

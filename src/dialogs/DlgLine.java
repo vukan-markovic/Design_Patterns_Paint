@@ -4,7 +4,6 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import shapes.Line;
-
 import java.awt.event.*;
 
 /**
@@ -226,9 +225,6 @@ public class DlgLine extends JDialog {
 		btnColor.setBackground(lineColor);
 	}
 
-	/**
-     * {@inheritDoc DlgSquare#isConfirmed()}
-     */
 	public boolean isConfirmed() {
 		return confirmed;
 	}

@@ -41,8 +41,8 @@ public class Point extends Shape {
     @Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Point) {
-			Point castedObj = (Point) obj;
-			return xCoordinate == castedObj.getXcoordinate() && yCoordinate == castedObj.getYcoordinate();
+			Point point = (Point) obj;
+			return xCoordinate == point.getXcoordinate() && yCoordinate == point.getYcoordinate();
 		}
 		return false;
 	}
@@ -51,9 +51,12 @@ public class Point extends Shape {
      * Compare two points depend on their distance.
      */
 	@Override
-	public int compareTo(Shape newPoint) {
-		Point coordinateStart = new Point(0, 0);
-		return (int) (distance(coordinateStart) - ((Point) newPoint).distance(coordinateStart));
+	public int compareTo(Shape shape) {
+		if (shape instanceof Point) {
+			Point startCoordinates = new Point(0, 0);
+			return (int) (distance(startCoordinates) - ((Point) shape).distance(startCoordinates));
+		}
+		return 0;
 	}
     
     /**

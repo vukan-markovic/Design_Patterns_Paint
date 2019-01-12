@@ -30,8 +30,17 @@ public class DrawingModel implements Serializable {
 	 * @param index Represent index on which shape will be added.
 	 * @param shape Represent shape which will be added.
 	 */
-	public void addShapeToIndex(int index, Shape shape) {
+	public void addToIndex(int index, Shape shape) {
 		shapes.add(index, shape);
+	}
+	
+	/**
+	 * Add multiple elements to list of shapes.
+	 * 
+	 * @param list Elements that are be added.
+	 */
+	public void addMultiple(ArrayList<Shape> shapes) {
+		this.shapes.addAll(shapes);
 	}
 	
 	/**
@@ -44,6 +53,15 @@ public class DrawingModel implements Serializable {
 	}
 	
 	/**
+	 * Remove shape at specified index.
+	 * 
+	 * @param index Represent index of shape that will be removed.
+	 */
+	public void removeAtIndex(int index) {
+		shapes.remove(index);
+	}
+	
+	/**
 	 * Remove multiple shapes from list.
 	 * 
 	 * @param shapes Shapes to be removed.
@@ -51,51 +69,23 @@ public class DrawingModel implements Serializable {
 	public void removeMultiple(ArrayList<Shape> shapes) {
 		this.shapes.removeAll(shapes);
 	}
-	
-	/**
-	 * Remove shape at specified index.
-	 * 
-	 * @param index Represent index of shape that will be removed.
-	 */
-	public void removeShapeAtIndex(int index) {
-		shapes.remove(index);
-	}
 
-	/**
-	 * Add multiple elements to list of shapes.
-	 * 
-	 * @param list Elements that are be added.
-	 */
-	public void addMultiple(ArrayList<Shape> list) {
-		shapes.addAll(list);
-	}
-	
 	/**
 	 * Remove all shapes from list of shapes.
 	 */
 	public void removeAll() {
-		shapes.removeAll(shapes);
-	}
-
-	/**
-	 * Add shape to specified index.
-	 * 
-	 * @param selectedShape Shape to be added.
-	 * @param index Index where shape will be added.
-	 */
-	public void addToIndex(Shape selectedShape, int index) {
-		shapes.add(index, selectedShape);
+		shapes.clear();
 	}
 	
-	public Shape getShapeByIndex(int index) {
+	public Shape getByIndex(int index) {
 		return shapes.get(index);
+	}
+	
+	public int getIndexOf(Shape shape) {
+		return shapes.indexOf(shape);
 	}
 	
 	public ArrayList<Shape> getAll() {
 		return shapes;
-	}
-	
-	public int getIndexOfShape(Shape selectedShape) {
-		return shapes.indexOf(selectedShape);
 	}
 }

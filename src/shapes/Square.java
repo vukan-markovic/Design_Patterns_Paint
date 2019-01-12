@@ -42,8 +42,8 @@ public class Square extends SurfaceShape {
     @Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Square) {
-			Square castedObj = (Square) obj;
-			return upLeft.equals(castedObj.upLeft) && side == castedObj.side;
+			Square square = (Square) obj;
+			return upLeft.equals(square.upLeft) && side == square.side;
 		}
 		return false;
 	}
@@ -52,8 +52,8 @@ public class Square extends SurfaceShape {
      * Compares two squares depend on their surface.
      */
     @Override
-	public int compareTo(Shape o) {
-		if (o instanceof Square) return surface() - ((Square) o).surface();
+	public int compareTo(Shape shape) {
+		if (shape instanceof Square) return surface() - ((Square) shape).surface();
 		return 0;
 	}
 
