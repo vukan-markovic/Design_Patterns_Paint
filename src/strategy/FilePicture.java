@@ -27,8 +27,8 @@ public class FilePicture implements FileHandler {
 		 BufferedImage imagebuffer = null;
 		    try {
 		        imagebuffer = new Robot().createScreenCapture(frame.getView().getBounds());
-		    } catch (AWTException e1) {
-		        e1.printStackTrace();
+		    } catch (AWTException e) {
+		    	System.out.println(e.getMessage());
 		    }  
 		    frame.getView().paint(imagebuffer.createGraphics());
 		    try {

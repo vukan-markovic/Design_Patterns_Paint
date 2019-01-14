@@ -32,7 +32,7 @@ public class CmdUpdateHexagon implements Command {
 	 */
 	@Override
 	public void unexecute() {
-		oldState.moveTo(originalState.getXcoordinate(), newState.getYcoordinate());
+		oldState.moveTo(originalState.getXcoordinate(), originalState.getYcoordinate());
 		oldState.setColor(originalState.getColor());
 		oldState.setInteriorColor(originalState.getInteriorColor());
 		oldState.setR(originalState.getR());

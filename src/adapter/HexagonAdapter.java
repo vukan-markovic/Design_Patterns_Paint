@@ -99,7 +99,7 @@ public class HexagonAdapter extends SurfaceShape {
 		Hexagon h = new Hexagon(getXcoordinate(), getYcoordinate(), getR());
 		h.setBorderColor(getColor());
 		h.setAreaColor(getInteriorColor());
-		return new HexagonAdapter(hexagon);
+		return new HexagonAdapter(h);
 	}
 
 	/**
@@ -126,8 +126,8 @@ public class HexagonAdapter extends SurfaceShape {
 	}
 	
 	public void setColor(Color color) {
-		super.setColor(color);
 		hexagon.setBorderColor(color);
+		super.setColor(color);
 	}
 	
 	public Color getInteriorColor() {
@@ -135,8 +135,8 @@ public class HexagonAdapter extends SurfaceShape {
 	}
 	
 	public void setInteriorColor(Color color) {
-		super.setInteriorColor(color);
 		hexagon.setAreaColor(color);
+		super.setInteriorColor(color);
 	}
 	
 	public int getR() {

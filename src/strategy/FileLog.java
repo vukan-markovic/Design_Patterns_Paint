@@ -34,6 +34,9 @@ import shapes.Rectangle;
 import shapes.Shape;
 import shapes.Square;
 
+/**
+ * Class that is responsible to save and parse log of executed commands.
+ */
 public class FileLog implements FileHandler {
 	private BufferedWriter writer;
 	private BufferedReader reader;

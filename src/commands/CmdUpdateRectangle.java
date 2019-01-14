@@ -3,8 +3,6 @@ package commands;
 import shapes.Rectangle;
 
 /**
- * @author Vukan Marković
- *
  * Class that represent command for update existing rectangle from the draw.
  */
 public class CmdUpdateRectangle implements Command {
@@ -35,7 +33,7 @@ public class CmdUpdateRectangle implements Command {
 	 */
 	@Override
 	public void unexecute() {
-		oldState.setUpLeft(originalState.getUpLeft());
+		oldState.setUpLeft(originalState.getUpLeft().clone());
 		oldState.setWidth(originalState.getWidth());
 		oldState.setSide(originalState.getSide());
 		oldState.setColor(originalState.getColor());
