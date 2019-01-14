@@ -9,8 +9,8 @@ import shapes.Shape;
 public class CmdBringToFront implements Command {
 	private DrawingModel model;
 	private Shape shape;
-	private int index;
 	private int size;
+	private int index;
 	
 	public CmdBringToFront(DrawingModel model, Shape shape, int size) {
 		this.model = model;
@@ -33,7 +33,7 @@ public class CmdBringToFront implements Command {
 	 */
 	@Override
 	public void unexecute() {
-		model.removeAtIndex(model.getAll().size() - 1);
+		model.removeAtIndex(size);
 		model.addToIndex(index, shape);
 	}
 }

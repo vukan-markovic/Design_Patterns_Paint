@@ -10,7 +10,7 @@ import model.DrawingModel;
 import shapes.Shape;
 
 /**
- * 
+ * Class that is responsible to save and open draw as serializable file.
  */
 public class FileDraw implements FileHandler {
 	private FileOutputStream fileOutputStream;

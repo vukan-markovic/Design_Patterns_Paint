@@ -30,8 +30,7 @@ public class CmdUpdatePoint implements Command {
 	 */
 	@Override
 	public void unexecute() {
-		oldState.setXcoordinate(originalState.getXcoordinate());
-		oldState.setYcoordinate(originalState.getYcoordinate());
+		oldState.moveTo(originalState.getXcoordinate(), originalState.getYcoordinate());
 		oldState.setColor(originalState.getColor());
 	}
 }

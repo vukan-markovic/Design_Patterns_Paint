@@ -9,9 +9,7 @@ import view.DrawingView;
 import java.awt.event.*;
 
 /**
- * @author Vukan Markovic
- * @version 1.0
- * @since 11.01.2019.
+ * Class that contains view, all GUI elements of the application and communicate with controller.
  */
 public class DrawingFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -468,15 +466,6 @@ public class DrawingFrame extends JFrame {
 	public MouseAdapter getMouseAdapterBringToBack() {
 		return mouseAdapterBringToBack;
 	}
-	
-	public void setController(DrawingController controller) {
-		this.controller = controller;
-		controller.addPropertyChangedListener(new DrawingObserver(this));
-	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
 
 	public JToggleButton getTglBtnDrawPoint() {
 		return tglBtnDrawPoint;
@@ -517,8 +506,9 @@ public class DrawingFrame extends JFrame {
 	public MouseAdapter getMouseAdapterInteriorColor() {
 		return mouseAdapterInteriorColor;
 	}
-
-	public JList<String> getActivityLog() {
-		return activityLog;
+	
+	public void setController(DrawingController controller) {
+		this.controller = controller;
+		controller.addPropertyChangedListener(new DrawingObserver(this));
 	}
 }
