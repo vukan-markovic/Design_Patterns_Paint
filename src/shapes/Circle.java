@@ -86,8 +86,7 @@ public class Circle extends SurfaceShape {
      * @return Boolean which indicate if circle contains click.
      */
     public boolean containsClick(int xCoordinate, int yCoordinate) {
-        if (new Point(xCoordinate, yCoordinate).distance(getCenter()) <= radius)
-            return true;
+        if (new Point(xCoordinate, yCoordinate).distance(getCenter()) <= radius) return true;
         return false;
     }
 

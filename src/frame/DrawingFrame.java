@@ -9,7 +9,7 @@ import view.DrawingView;
 import java.awt.event.*;
 
 /**
- * Class that contains view, all GUI elements of the application and communicate with controller.
+ * Class that contains view, all GUI elements of the application and notify controller when user do some action.
  */
 public class DrawingFrame extends JFrame {
 	private static final long serialVersionUID = 1L;

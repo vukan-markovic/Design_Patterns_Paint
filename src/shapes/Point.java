@@ -98,8 +98,7 @@ public class Point extends Shape {
      * @return Boolean indicating if this point contain user click.
      */
     public boolean containsClick(int xCoordinate, int yCoordinate) {
-        if (new Point(xCoordinate, yCoordinate).distance(this) <= 2)
-            return true;
+        if (new Point(xCoordinate, yCoordinate).distance(this) <= 2) return true;
         return false;
     }
     

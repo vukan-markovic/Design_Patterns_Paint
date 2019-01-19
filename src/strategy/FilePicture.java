@@ -1,6 +1,5 @@
 package strategy;
 
-import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -27,11 +26,7 @@ public class FilePicture implements FileHandler {
 		 BufferedImage imagebuffer = null;
 		    try {
 		        imagebuffer = new Robot().createScreenCapture(frame.getView().getBounds());
-		    } catch (AWTException e) {
-		    	System.out.println(e.getMessage());
-		    }  
-		    frame.getView().paint(imagebuffer.createGraphics());
-		    try {
+		        frame.getView().paint(imagebuffer.createGraphics());
 		        ImageIO.write(imagebuffer,"jpeg", new File(file + ".jpeg"));
 		    } catch (Exception e) {
 		        System.out.println(e.getMessage());

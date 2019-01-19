@@ -33,7 +33,7 @@ public class CmdUpdateRectangle implements Command {
 	 */
 	@Override
 	public void unexecute() {
-		oldState.setUpLeft(originalState.getUpLeft().clone());
+		oldState.setUpLeft(originalState.getUpLeft());
 		oldState.setWidth(originalState.getWidth());
 		oldState.setSide(originalState.getSide());
 		oldState.setColor(originalState.getColor());

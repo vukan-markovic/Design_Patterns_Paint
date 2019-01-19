@@ -32,7 +32,7 @@ public class CmdUpdateSquare implements Command {
 	 */
 	@Override
 	public void unexecute() {
-		oldState.setUpLeft(originalState.getUpLeft().clone());
+		oldState.setUpLeft(originalState.getUpLeft());
 		oldState.setSide(originalState.getSide());
 		oldState.setColor(originalState.getColor());
 		oldState.setInteriorColor(originalState.getInteriorColor());

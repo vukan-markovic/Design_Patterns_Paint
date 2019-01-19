@@ -31,8 +31,8 @@ public class CmdUpdateLine implements Command {
 	 */
 	@Override
 	public void unexecute() {
-		oldState.setInitial(originalState.getInitial().clone());
-		oldState.setLast(originalState.getLast().clone());
+		oldState.setInitial(originalState.getInitial());
+		oldState.setLast(originalState.getLast());
 		oldState.setColor(originalState.getColor());
 	}
 }

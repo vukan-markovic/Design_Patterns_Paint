@@ -550,8 +550,8 @@ public class DrawingController {
 		if (model.getAll().isEmpty()) propertyChangeSupport.firePropertyChange("shape don't exist", false, true);
 		else if (model.getAll().size() == 1) propertyChangeSupport.firePropertyChange("shape exist", false, true);
 		
-		if (commands.size() == 1) propertyChangeSupport.firePropertyChange("draw is not empty", false, true);
 		if (commands.isEmpty()) propertyChangeSupport.firePropertyChange("draw is empty", false, true);
+		else if (commands.size() == 1) propertyChangeSupport.firePropertyChange("draw is not empty", false, true);
 		frame.getView().repaint();
 	}
 	
@@ -646,6 +646,7 @@ public class DrawingController {
 		chooser.setEnabled(true);
 		chooser.setAcceptAllFileFilterUsed(false);
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		chooser.setFileSelectionMode(JFileChooser.OPEN_DIALOG);
 		chooser.setFileFilter(new FileNameExtensionFilter("Serialized draw", "ser"));
 		chooser.setFileFilter(new FileNameExtensionFilter("Commands log", "log"));
 		if(chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
