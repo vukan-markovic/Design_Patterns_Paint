@@ -26,15 +26,15 @@ public class FileDraw implements FileHandler {
 	 */
 	@Override
 	public void save(File file) {
-			try {
-				fileOutputStream = new FileOutputStream(file + ".ser");
-				ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
-				out.writeObject(model.getAll());
-				out.close();
-				fileOutputStream.close();
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-			}
+		try {
+			fileOutputStream = new FileOutputStream(file + ".ser");
+			ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
+			out.writeObject(model.getAll());
+			out.close();
+			fileOutputStream.close();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 	}
 
 	/**

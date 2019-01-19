@@ -33,7 +33,7 @@ public class CmdUpdateCircle implements Command {
 	@Override
 	public void unexecute() {
 		oldState.setRadius(originalState.getRadius());
-		oldState.setCenter(originalState.getCenter().clone());
+		oldState.setCenter(originalState.getCenter());
 		oldState.setInteriorColor(originalState.getInteriorColor());
 		oldState.setColor(originalState.getColor());
 	}

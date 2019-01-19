@@ -35,7 +35,7 @@ public class DrawingModel implements Serializable {
 	}
 	
 	/**
-	 * Add multiple elements to list of shapes.
+	 * Add multiple shapes to list of shapes.
 	 * 
 	 * @param list Elements that are be added.
 	 */
@@ -44,7 +44,7 @@ public class DrawingModel implements Serializable {
 	}
 	
 	/**
-	 * Remove shapes from list of shapes.
+	 * Remove shape from list of shapes.
 	 * 
 	 * @param shape Shape to be removed.
 	 */
@@ -62,7 +62,7 @@ public class DrawingModel implements Serializable {
 	}
 	
 	/**
-	 * Remove multiple shapes from list.
+	 * Remove multiple shapes from list of shapes.
 	 * 
 	 * @param shapes Shapes to be removed.
 	 */
